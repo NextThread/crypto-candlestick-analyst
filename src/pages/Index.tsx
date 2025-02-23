@@ -8,6 +8,7 @@ import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Subscribe from "@/components/Subscribe";
 import { ArrowDown, Check } from "lucide-react";
+import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 
 const Index = () => {
   return (
@@ -41,7 +42,16 @@ const Index = () => {
         <div className="container px-4 mx-auto">
           <div className="space-y-8 animate-fade-in" style={{ animationDelay: "200ms" }}>
             <SearchBar />
-            <ChartUpload />
+            <SignedIn>
+              <ChartUpload />
+            </SignedIn>
+            <SignedOut>
+              <div className="text-center p-8 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-200/10">
+                <h3 className="text-xl font-semibold mb-4">Sign In to Upload Charts</h3>
+                <p className="text-gray-400 mb-6">Create an account or sign in to analyze your crypto charts</p>
+                <SignIn />
+              </div>
+            </SignedOut>
             <AnalysisDisplay />
           </div>
         </div>
