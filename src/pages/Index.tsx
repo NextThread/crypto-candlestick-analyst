@@ -33,15 +33,6 @@ const Index = () => {
               <ArrowDown className="w-4 h-4 animate-bounce" />
             </a>
           </div>
-
-          {/* Demo Image */}
-          <div className="max-w-4xl mx-auto mb-16">
-            <img
-              src="https://images.unsplash.com/photo-1498050108023-c5249f4df085"
-              alt="Crypto Analysis Dashboard"
-              className="w-full rounded-xl shadow-2xl border border-gray-200/10"
-            />
-          </div>
         </div>
       </div>
 
