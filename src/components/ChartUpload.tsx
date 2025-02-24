@@ -1,16 +1,28 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ChartCandlestick, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+const ANALYSIS_LIMIT = 3;
+const ANALYSIS_COUNT_KEY = "analysisCount";
 
 const ChartUpload = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [analysisCount, setAnalysisCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  useEffect(() => {
+    const storedCount = localStorage.getItem(ANALYSIS_COUNT_KEY);
+    if (storedCount) {
+      setAnalysisCount(parseInt(storedCount));
+    }
+  }, []);
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    if (analysisCount >= ANALYSIS_LIMIT) return;
     setIsDragging(true);
   };
 
@@ -21,6 +33,14 @@ const ChartUpload = () => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+    if (analysisCount >= ANALYSIS_LIMIT) {
+      toast({
+        title: "Analysis Limit Reached",
+        description: "Please subscribe to analyze more charts",
+        variant: "destructive",
+      });
+      return;
+    }
     const file = e.dataTransfer.files[0];
     if (file) {
       processImageFile(file);
@@ -28,6 +48,14 @@ const ChartUpload = () => {
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (analysisCount >= ANALYSIS_LIMIT) {
+      toast({
+        title: "Analysis Limit Reached",
+        description: "Please subscribe to analyze more charts",
+        variant: "destructive",
+      });
+      return;
+    }
     const file = e.target.files?.[0];
     if (file) {
       processImageFile(file);
@@ -47,6 +75,15 @@ const ChartUpload = () => {
   };
 
   const handleCameraCapture = async () => {
+    if (analysisCount >= ANALYSIS_LIMIT) {
+      toast({
+        title: "Analysis Limit Reached",
+        description: "Please subscribe to analyze more charts",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       const video = document.createElement("video");
@@ -78,7 +115,9 @@ const ChartUpload = () => {
         isDragging
           ? "bg-primary/10 border-primary/50"
           : "bg-white/5 border-gray-200/20"
-      } border-2 border-dashed backdrop-blur-sm`}
+      } border-2 border-dashed backdrop-blur-sm ${
+        analysisCount >= ANALYSIS_LIMIT ? "opacity-50 pointer-events-none" : ""
+      }`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -106,19 +145,28 @@ const ChartUpload = () => {
             <div className="flex-1">
               <h3 className="text-lg font-medium mb-1">Upload Chart</h3>
               <p className="text-sm text-gray-400">
-                Drag and drop your chart image here, or{" "}
-                <button
-                  className="text-primary hover:underline transition-all"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  browse
-                </button>
+                {analysisCount >= ANALYSIS_LIMIT ? (
+                  "Analysis limit reached. Please subscribe to continue."
+                ) : (
+                  <>
+                    Drag and drop your chart image here, or{" "}
+                    <button
+                      className="text-primary hover:underline transition-all"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      browse
+                    </button>
+                  </>
+                )}
               </p>
             </div>
           </div>
           <button
             onClick={handleCameraCapture}
-            className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
+            disabled={analysisCount >= ANALYSIS_LIMIT}
+            className={`flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors ${
+              analysisCount >= ANALYSIS_LIMIT ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             <Camera size={20} />
             Use Camera
@@ -137,3 +185,4 @@ const ChartUpload = () => {
 };
 
 export default ChartUpload;
+
