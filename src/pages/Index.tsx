@@ -1,8 +1,6 @@
-
 import SearchBar from "@/components/SearchBar";
 import ChartUpload from "@/components/ChartUpload";
 import AnalysisDisplay from "@/components/AnalysisDisplay";
-import Navbar from "@/components/Navbar";
 import Features from "@/components/Features";
 import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
@@ -13,8 +11,6 @@ import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
-      <Navbar />
-      
       {/* Hero Section */}
       <div className="pt-24 pb-16">
         <div className="container px-4 mx-auto">
