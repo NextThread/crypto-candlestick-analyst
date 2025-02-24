@@ -2,10 +2,12 @@
 import { useState, useRef } from "react";
 import { ChartCandlestick, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { analyzeCrypto } from "@/utils/cryptoAnalysis";
 
 const ChartUpload = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -44,6 +46,37 @@ const ChartUpload = () => {
       return;
     }
     setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleAnalyze = async () => {
+    if (!previewUrl) {
+      toast({
+        title: "No chart uploaded",
+        description: "Please upload a chart image first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAnalyzing(true);
+    try {
+      // For demo purposes, we'll analyze Bitcoin. In a real app, you'd analyze the chart image
+      const analysis = await analyzeCrypto("bitcoin");
+      if (analysis) {
+        toast({
+          title: "Analysis Complete",
+          description: "Check the results below",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Analysis Failed",
+        description: "Unable to analyze the chart",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handleCameraCapture = async () => {
@@ -85,18 +118,29 @@ const ChartUpload = () => {
     >
       <div className="flex flex-col items-center gap-4 text-center">
         {previewUrl ? (
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-md space-y-4">
             <img
               src={previewUrl}
               alt="Chart preview"
               className="w-full h-auto rounded-lg"
             />
-            <button
-              onClick={() => setPreviewUrl(null)}
-              className="mt-4 text-red-500 hover:text-red-400 transition-colors"
-            >
-              Remove Image
-            </button>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => setPreviewUrl(null)}
+                className="px-4 py-2 text-red-500 hover:text-red-400 transition-colors"
+              >
+                Remove Image
+              </button>
+              <button
+                onClick={handleAnalyze}
+                disabled={isAnalyzing}
+                className={`px-6 py-2 rounded-lg bg-primary hover:bg-primary/90 transition-colors ${
+                  isAnalyzing ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {isAnalyzing ? "Analyzing..." : "Analyze Chart"}
+              </button>
+            </div>
           </div>
         ) : (
           <>
