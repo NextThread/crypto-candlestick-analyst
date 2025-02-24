@@ -2,12 +2,10 @@
 import { useState, useRef } from "react";
 import { ChartCandlestick, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { analyzeCrypto } from "@/utils/cryptoAnalysis";
 
 const ChartUpload = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -48,37 +46,6 @@ const ChartUpload = () => {
     setPreviewUrl(URL.createObjectURL(file));
   };
 
-  const handleAnalyze = async () => {
-    if (!previewUrl) {
-      toast({
-        title: "No chart uploaded",
-        description: "Please upload a chart image first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsAnalyzing(true);
-    try {
-      // For demo purposes, we'll analyze Bitcoin. In a real app, you'd analyze the chart image
-      const analysis = await analyzeCrypto("bitcoin");
-      if (analysis) {
-        toast({
-          title: "Analysis Complete",
-          description: "Check the results below",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Analysis Failed",
-        description: "Unable to analyze the chart",
-        variant: "destructive",
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
   const handleCameraCapture = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -107,7 +74,7 @@ const ChartUpload = () => {
 
   return (
     <div
-      className={`w-full max-w-2xl mx-auto mt-8 p-8 rounded-2xl transition-all duration-300 ${
+      className={`w-full max-w-4xl mx-auto mt-8 p-8 rounded-2xl transition-all duration-300 ${
         isDragging
           ? "bg-primary/10 border-primary/50"
           : "bg-white/5 border-gray-200/20"
@@ -116,37 +83,28 @@ const ChartUpload = () => {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <div className="flex flex-col items-center gap-4 text-center">
-        {previewUrl ? (
-          <div className="w-full max-w-md space-y-4">
+      {previewUrl ? (
+        <div className="flex gap-8 items-center">
+          <div className="flex-1">
             <img
               src={previewUrl}
               alt="Chart preview"
               className="w-full h-auto rounded-lg"
             />
-            <div className="flex gap-4 justify-center">
-              <button
-                onClick={() => setPreviewUrl(null)}
-                className="px-4 py-2 text-red-500 hover:text-red-400 transition-colors"
-              >
-                Remove Image
-              </button>
-              <button
-                onClick={handleAnalyze}
-                disabled={isAnalyzing}
-                className={`px-6 py-2 rounded-lg bg-primary hover:bg-primary/90 transition-colors ${
-                  isAnalyzing ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                {isAnalyzing ? "Analyzing..." : "Analyze Chart"}
-              </button>
-            </div>
           </div>
-        ) : (
-          <>
-            <ChartCandlestick size={48} className="text-primary" />
-            <div>
-              <h3 className="text-xl font-medium mb-2">Upload Chart</h3>
+          <button
+            onClick={() => setPreviewUrl(null)}
+            className="px-4 py-2 text-red-500 hover:text-red-400 transition-colors"
+          >
+            Remove Image
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-8">
+          <div className="flex-1 flex items-center gap-4">
+            <ChartCandlestick size={32} className="text-primary" />
+            <div className="flex-1">
+              <h3 className="text-lg font-medium mb-1">Upload Chart</h3>
               <p className="text-sm text-gray-400">
                 Drag and drop your chart image here, or{" "}
                 <button
@@ -156,26 +114,24 @@ const ChartUpload = () => {
                   browse
                 </button>
               </p>
-              <div className="mt-4 flex gap-4 justify-center">
-                <button
-                  onClick={handleCameraCapture}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
-                >
-                  <Camera size={20} />
-                  Use Camera
-                </button>
-              </div>
             </div>
-          </>
-        )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileInput}
-        />
-      </div>
+          </div>
+          <button
+            onClick={handleCameraCapture}
+            className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
+          >
+            <Camera size={20} />
+            Use Camera
+          </button>
+        </div>
+      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileInput}
+      />
     </div>
   );
 };

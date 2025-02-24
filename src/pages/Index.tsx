@@ -37,18 +37,20 @@ const Index = () => {
       <div id="analysis" className="py-16">
         <div className="container px-4 mx-auto">
           <div className="space-y-8 animate-fade-in" style={{ animationDelay: "200ms" }}>
-            <SearchBar />
-            <SignedIn>
-              <ChartUpload />
-            </SignedIn>
-            <SignedOut>
-              <div className="text-center p-8 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-200/10">
-                <h3 className="text-xl font-semibold mb-4">Sign In to Upload Charts</h3>
-                <p className="text-gray-400 mb-6">Create an account or sign in to analyze your crypto charts</p>
-                <SignIn />
-              </div>
-            </SignedOut>
-            <AnalysisDisplay />
+            <div className="space-y-8">
+              <SignedIn>
+                <SearchBar />
+                <ChartUpload />
+                <AnalysisDisplay />
+              </SignedIn>
+              <SignedOut>
+                <div className="text-center p-8 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-200/10">
+                  <h3 className="text-xl font-semibold mb-4">Sign In to Analyze Charts</h3>
+                  <p className="text-gray-400 mb-6">Create an account or sign in to analyze your crypto charts</p>
+                  <SignIn />
+                </div>
+              </SignedOut>
+            </div>
           </div>
         </div>
       </div>
