@@ -1,4 +1,3 @@
-
 import axios from "axios";
 
 export interface CryptoAnalysis {
@@ -10,9 +9,9 @@ export interface CryptoAnalysis {
   volatility: number;
   entryPoint: number;
   stopLoss: number;
-  target1: number;
-  target2: number;
-  target3: number;
+  target1: number; // 1:2 risk-reward
+  target2: number; // 1:3 risk-reward
+  target3: number; // 1:4 risk-reward
   exit: number;
   support: number;
   resistance: number;
@@ -54,10 +53,15 @@ export async function analyzeCrypto(cryptoName: string): Promise<CryptoAnalysis 
     const volatility = calculateVolatility(prices.slice(-14));
 
     const entryPoint = currentPrice;
-    const stopLoss = entryPoint * 0.95;
-    const target1 = entryPoint * 1.05;
-    const target2 = entryPoint * 1.1;
-    const target3 = entryPoint * 1.15;
+    const riskPercentage = 0.05; // 5% below entry for stop loss
+    const stopLoss = entryPoint * (1 - riskPercentage); // e.g., 95 if entry is 100
+
+    // Calculate targets based on risk-reward ratios
+    const riskAmount = entryPoint - stopLoss; // e.g., 5 if entry is 100 and stop loss is 95
+    const target1 = entryPoint + riskAmount * 2; // 1:2 ratio (e.g., 110)
+    const target2 = entryPoint + riskAmount * 3; // 1:3 ratio (e.g., 115)
+    const target3 = entryPoint + riskAmount * 4; // 1:4 ratio (e.g., 120)
+
     const exit = trend === "Bullish" ? resistance * 0.98 : support * 1.02;
 
     return {
