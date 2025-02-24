@@ -1,51 +1,13 @@
 
-import { useState } from "react";
-import { analyzeCrypto, type CryptoAnalysis } from "@/utils/cryptoAnalysis";
-import { useToast } from "@/hooks/use-toast";
+import { CryptoAnalysis } from "@/utils/cryptoAnalysis";
 
-const AnalysisDisplay = () => {
-  const [analysis, setAnalysis] = useState<CryptoAnalysis | null>(null);
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-
-  const handleAnalyze = async (cryptoName: string) => {
-    setLoading(true);
-    try {
-      const result = await analyzeCrypto(cryptoName);
-      if (result) {
-        setAnalysis(result);
-      } else {
-        toast({
-          title: "Analysis Error",
-          description: "Unable to analyze the cryptocurrency",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An error occurred while analyzing the chart",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="w-full max-w-4xl mx-auto mt-12 p-6 rounded-2xl bg-white/5 backdrop-blur-md border border-gray-200/20">
-        <div className="text-center text-gray-400">Loading analysis...</div>
-      </div>
-    );
-  }
-
+const AnalysisDisplay = ({ analysis }: { analysis: CryptoAnalysis | null }) => {
   if (!analysis) {
     return null;
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-12 p-6 rounded-2xl bg-white/5 backdrop-blur-md border border-gray-200/20">
+    <div className="w-full h-full p-6 rounded-2xl bg-white/5 backdrop-blur-md border border-gray-200/20">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-6">
           <div>
@@ -119,3 +81,4 @@ const AnalysisDisplay = () => {
 };
 
 export default AnalysisDisplay;
+

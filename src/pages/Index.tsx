@@ -7,8 +7,11 @@ import Contact from "@/components/Contact";
 import Subscribe from "@/components/Subscribe";
 import { ArrowDown, Check } from "lucide-react";
 import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
+import { useState } from "react";
 
 const Index = () => {
+  const [analysisResult, setAnalysisResult] = useState(null);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
       {/* Hero Section */}
@@ -39,9 +42,15 @@ const Index = () => {
           <div className="space-y-8 animate-fade-in" style={{ animationDelay: "200ms" }}>
             <div className="space-y-8">
               <SignedIn>
-                <SearchBar />
-                <ChartUpload />
-                <AnalysisDisplay />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="space-y-8">
+                    <SearchBar onAnalysisComplete={setAnalysisResult} />
+                    <ChartUpload />
+                  </div>
+                  <div className="h-full">
+                    <AnalysisDisplay analysis={analysisResult} />
+                  </div>
+                </div>
               </SignedIn>
               <SignedOut>
                 <div className="text-center p-8 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-200/10">

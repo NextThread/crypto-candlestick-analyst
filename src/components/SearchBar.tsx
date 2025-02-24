@@ -4,7 +4,7 @@ import { useState } from "react";
 import { analyzeCrypto } from "@/utils/cryptoAnalysis";
 import { useToast } from "@/hooks/use-toast";
 
-const SearchBar = () => {
+const SearchBar = ({ onAnalysisComplete }: { onAnalysisComplete: (analysis: any) => void }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
@@ -23,9 +23,10 @@ const SearchBar = () => {
     try {
       const analysis = await analyzeCrypto(searchQuery.toLowerCase());
       if (analysis) {
+        onAnalysisComplete(analysis);
         toast({
           title: "Analysis Complete",
-          description: "Check the results below",
+          description: "Check the results on the right",
         });
       }
     } catch (error) {
@@ -40,7 +41,7 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex gap-4 items-center">
+    <div className="w-full flex gap-4 items-center">
       <div className="relative flex-1">
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
         <input
@@ -66,3 +67,4 @@ const SearchBar = () => {
 };
 
 export default SearchBar;
+
