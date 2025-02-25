@@ -8,6 +8,7 @@ import Subscribe from "@/components/Subscribe";
 import { ArrowDown, Check } from "lucide-react";
 import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 import { useState } from "react";
+import CryptoNews from "@/components/CryptoNews";
 
 const Index = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
@@ -63,6 +64,9 @@ const Index = () => {
           </div>
         </div>
       </div>
+
+      {/* Crypto News Section */}
+      <CryptoNews />
 
       {/* Features */}
       <Features />
