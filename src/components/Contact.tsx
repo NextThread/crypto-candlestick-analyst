@@ -19,15 +19,15 @@ const Contact = () => {
 
     try {
       await emailjs.send(
-        'YOUR_SERVICE_ID', // Replace with your EmailJS service ID
-        'YOUR_TEMPLATE_ID', // Replace with your EmailJS template ID
+        'service_4fq69lz', // Replace with your EmailJS service ID
+        'template_wlqkrtm', // Replace with your EmailJS template ID
         {
           to_email: 'chartlyaiteam@gmail.com',
           from_name: formData.name,
           from_email: formData.email,
           message: formData.message,
         },
-        'YOUR_PUBLIC_KEY' // Replace with your EmailJS public key
+        'UKzsqP758q2kJZEQu' // Replace with your EmailJS public key
       );
 
       toast({
