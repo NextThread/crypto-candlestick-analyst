@@ -1,23 +1,31 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { Calendar, ArrowUpRight } from "lucide-react";
 import axios from "axios";
 
+// Updated interface to match CryptoCompare's news response
 interface NewsItem {
+  id: string;
   title: string;
   url: string;
-  published_at: string;
-  description: string;
+  published_on: number; // Unix timestamp
+  body: string; // Using 'body' as description
 }
 
 const CryptoNews = () => {
-  const { data: news, isLoading } = useQuery({
+  const { data: news, isLoading, error } = useQuery({
     queryKey: ["crypto-news"],
     queryFn: async () => {
-      const response = await axios.get(
-        "https://api.coingecko.com/api/v3/news"
-      );
-      return response.data.slice(0, 5);
+      try {
+        const response = await axios.get(
+          "https://min-api.cryptocompare.com/data/v2/news/?lang=EN"
+        );
+        console.log("API Response:", response.data);
+        // CryptoCompare returns data in a 'Data' property
+        return response.data.Data.slice(0, 5);
+      } catch (err) {
+        console.error("Error fetching news:", err);
+        throw err;
+      }
     },
   });
 
@@ -38,14 +46,34 @@ const CryptoNews = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="py-20">
+        <div className="container mx-auto px-4">
+          <p className="text-red-500">Error loading news: {error.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!news || news.length === 0) {
+    return (
+      <div className="py-20">
+        <div className="container mx-auto px-4">
+          <p>No news available at the moment</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section className="py-20">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-12">Latest Crypto News</h2>
         <div className="grid gap-6 max-w-5xl mx-auto">
-          {news?.map((item: NewsItem) => (
+          {news.map((item: NewsItem) => (
             <a
-              key={item.url}
+              key={item.id}
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
@@ -56,11 +84,11 @@ const CryptoNews = () => {
                   <h3 className="text-xl font-semibold group-hover:text-primary transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-gray-400 line-clamp-2">{item.description}</p>
+                  <p className="text-gray-400 line-clamp-2">{item.body}</p>
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <Calendar size={16} />
                     <span>
-                      {new Date(item.published_at).toLocaleDateString()}
+                      {new Date(item.published_on * 1000).toLocaleDateString()}
                     </span>
                   </div>
                 </div>
