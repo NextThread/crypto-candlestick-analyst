@@ -172,7 +172,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="py-8 border-t border-gray-200/10">
         <div className="container mx-auto px-4 text-center text-gray-400">
-          <p>&copy; 2024 CryptoAI. All rights reserved.</p>
+          <p>&copy; 2025 CryptoAI. All rights reserved.</p>
         </div>
       </footer>
     </div>

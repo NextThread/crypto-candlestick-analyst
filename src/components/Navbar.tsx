@@ -19,7 +19,7 @@ const Navbar = () => {
             <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
             <a href="#testimonials" className="text-gray-300 hover:text-white transition-colors">Testimonials</a>
             <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
-            <Link to="/subscribe" className="text-gray-300 hover:text-white transition-colors">Subscribe</Link>
+            {/* <Link to="/subscribe" className="text-gray-300 hover:text-white transition-colors">Subscribe</Link> */}
             {isSignedIn && (
               <button
                 onClick={handleSignOut}
