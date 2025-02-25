@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { analyzeCrypto } from "@/utils/cryptoAnalysis";
 import { useToast } from "@/hooks/use-toast";
 import SubscriptionAlert from "./SubscriptionAlert";
+import { useUser } from "@clerk/clerk-react";
 
 const ANALYSIS_LIMIT = 3;
 const ANALYSIS_COUNT_KEY = "analysisCount";
@@ -14,24 +15,40 @@ const SearchBar = ({ onAnalysisComplete }: { onAnalysisComplete: (analysis: any)
   const [analysisCount, setAnalysisCount] = useState(0);
   const [showLimitAlert, setShowLimitAlert] = useState(false);
   const { toast } = useToast();
+  const { user } = useUser();
 
   useEffect(() => {
-    const storedCount = localStorage.getItem(ANALYSIS_COUNT_KEY);
-    if (storedCount) {
-      setAnalysisCount(parseInt(storedCount));
+    if (user) {
+      const storedCount = localStorage.getItem(`${ANALYSIS_COUNT_KEY}_${user.id}`);
+      if (storedCount) {
+        setAnalysisCount(parseInt(storedCount));
+      } else {
+        setAnalysisCount(0);
+        localStorage.setItem(`${ANALYSIS_COUNT_KEY}_${user.id}`, "0");
+      }
     }
-  }, []);
+  }, [user]);
 
   const incrementAnalysisCount = () => {
+    if (!user) return;
     const newCount = analysisCount + 1;
     setAnalysisCount(newCount);
-    localStorage.setItem(ANALYSIS_COUNT_KEY, newCount.toString());
+    localStorage.setItem(`${ANALYSIS_COUNT_KEY}_${user.id}`, newCount.toString());
     if (newCount >= ANALYSIS_LIMIT) {
       setShowLimitAlert(true);
     }
   };
 
   const handleAnalyze = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to analyze charts",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (analysisCount >= ANALYSIS_LIMIT) {
       setShowLimitAlert(true);
       return;
@@ -98,4 +115,3 @@ const SearchBar = ({ onAnalysisComplete }: { onAnalysisComplete: (analysis: any)
 };
 
 export default SearchBar;
-

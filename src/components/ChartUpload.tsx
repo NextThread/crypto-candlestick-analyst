@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChartCandlestick, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@clerk/clerk-react";
 
 const ANALYSIS_LIMIT = 3;
 const ANALYSIS_COUNT_KEY = "analysisCount";
@@ -12,17 +13,23 @@ const ChartUpload = () => {
   const [analysisCount, setAnalysisCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { user } = useUser();
 
   useEffect(() => {
-    const storedCount = localStorage.getItem(ANALYSIS_COUNT_KEY);
-    if (storedCount) {
-      setAnalysisCount(parseInt(storedCount));
+    if (user) {
+      const storedCount = localStorage.getItem(`${ANALYSIS_COUNT_KEY}_${user.id}`);
+      if (storedCount) {
+        setAnalysisCount(parseInt(storedCount));
+      } else {
+        setAnalysisCount(0);
+        localStorage.setItem(`${ANALYSIS_COUNT_KEY}_${user.id}`, "0");
+      }
     }
-  }, []);
+  }, [user]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    if (analysisCount >= ANALYSIS_LIMIT) return;
+    if (!user || analysisCount >= ANALYSIS_LIMIT) return;
     setIsDragging(true);
   };
 
@@ -33,6 +40,16 @@ const ChartUpload = () => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to analyze charts",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (analysisCount >= ANALYSIS_LIMIT) {
       toast({
         title: "Analysis Limit Reached",
@@ -41,6 +58,7 @@ const ChartUpload = () => {
       });
       return;
     }
+    
     const file = e.dataTransfer.files[0];
     if (file) {
       processImageFile(file);
@@ -48,6 +66,15 @@ const ChartUpload = () => {
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to analyze charts",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (analysisCount >= ANALYSIS_LIMIT) {
       toast({
         title: "Analysis Limit Reached",
@@ -56,6 +83,7 @@ const ChartUpload = () => {
       });
       return;
     }
+
     const file = e.target.files?.[0];
     if (file) {
       processImageFile(file);
@@ -75,6 +103,15 @@ const ChartUpload = () => {
   };
 
   const handleCameraCapture = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to analyze charts",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (analysisCount >= ANALYSIS_LIMIT) {
       toast({
         title: "Analysis Limit Reached",
@@ -116,7 +153,7 @@ const ChartUpload = () => {
           ? "bg-primary/10 border-primary/50"
           : "bg-white/5 border-gray-200/20"
       } border-2 border-dashed backdrop-blur-sm ${
-        analysisCount >= ANALYSIS_LIMIT ? "opacity-50 pointer-events-none" : ""
+        !user || analysisCount >= ANALYSIS_LIMIT ? "opacity-50 pointer-events-none" : ""
       }`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -145,7 +182,9 @@ const ChartUpload = () => {
             <div className="flex-1">
               <h3 className="text-lg font-medium mb-1">Upload Chart</h3>
               <p className="text-sm text-gray-400">
-                {analysisCount >= ANALYSIS_LIMIT ? (
+                {!user ? (
+                  "Please sign in to analyze charts"
+                ) : analysisCount >= ANALYSIS_LIMIT ? (
                   "Analysis limit reached. Please subscribe to continue."
                 ) : (
                   <>
@@ -163,9 +202,9 @@ const ChartUpload = () => {
           </div>
           <button
             onClick={handleCameraCapture}
-            disabled={analysisCount >= ANALYSIS_LIMIT}
+            disabled={!user || analysisCount >= ANALYSIS_LIMIT}
             className={`flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors ${
-              analysisCount >= ANALYSIS_LIMIT ? "opacity-50 cursor-not-allowed" : ""
+              !user || analysisCount >= ANALYSIS_LIMIT ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             <Camera size={20} />
@@ -185,4 +224,3 @@ const ChartUpload = () => {
 };
 
 export default ChartUpload;
-
