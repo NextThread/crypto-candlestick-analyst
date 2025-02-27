@@ -5,6 +5,7 @@ import Features from "@/components/Features";
 import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Subscribe from "@/components/Subscribe";
+import FAQ from "@/components/FAQ";
 import { ArrowDown, Check } from "lucide-react";
 import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 import { useState } from "react";
@@ -159,6 +160,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <FAQ />
 
       {/* Testimonials */}
       <Testimonials />
