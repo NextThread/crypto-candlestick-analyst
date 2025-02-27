@@ -9,6 +9,17 @@ const ChatBot = () => {
     { text: "Hello! How can I help you today?", isBot: true }
   ]);
 
+  const getRandomGreeting = () => {
+    const greetings = [
+      "Hi there! How can I assist you?",
+      "Hello! How are you today?",
+      "Hey! What can I help you with?",
+      "Greetings! How may I be of service?",
+      "Welcome! How can I support you today?"
+    ];
+    return greetings[Math.floor(Math.random() * greetings.length)];
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -16,12 +27,21 @@ const ChatBot = () => {
     // Add user message
     setMessages(prev => [...prev, { text: message, isBot: false }]);
 
-    // Simulate bot response
+    // Simple keyword-based response system
+    const lowerMessage = message.toLowerCase();
+    let botResponse = "";
+
+    if (lowerMessage.includes("hello") || lowerMessage.includes("hi")) {
+      botResponse = getRandomGreeting();
+    } else if (lowerMessage.includes("how are you")) {
+      botResponse = "I'm doing great, thanks for asking! How can I help you today?";
+    } else {
+      botResponse = "Thanks for your message! Our team will get back to you soon.";
+    }
+
+    // Add bot response
     setTimeout(() => {
-      setMessages(prev => [...prev, {
-        text: "Thanks for your message! Our team will get back to you soon.",
-        isBot: true
-      }]);
+      setMessages(prev => [...prev, { text: botResponse, isBot: true }]);
     }, 1000);
 
     setMessage("");
@@ -89,4 +109,3 @@ const ChatBot = () => {
 };
 
 export default ChatBot;
-

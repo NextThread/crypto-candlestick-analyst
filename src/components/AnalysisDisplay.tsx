@@ -1,3 +1,4 @@
+
 import { CryptoAnalysis } from "@/utils/cryptoAnalysis";
 
 const AnalysisDisplay = ({ analysis }: { analysis: CryptoAnalysis | null }) => {
@@ -7,7 +8,7 @@ const AnalysisDisplay = ({ analysis }: { analysis: CryptoAnalysis | null }) => {
 
   // Craft a brief analysis based on the available data
   const getAnalysisSummary = () => {
-    const { currentPrice, trend, sma7, sma14, sma30, volatility, support, resistance } = analysis;
+    const { currentPrice, trend, sma7, sma14, sma30, volatility, support, resistance, volume } = analysis;
     const isBullish = trend === "Bullish";
     const priceVsSma7 = currentPrice > sma7 ? "above" : "below";
     const priceMovement = isBullish
@@ -16,6 +17,8 @@ const AnalysisDisplay = ({ analysis }: { analysis: CryptoAnalysis | null }) => {
     const smaObservation = `The current price is ${priceVsSma7} the 7-day SMA ($${sma7.toFixed(2)}), which supports a ${trend.toLowerCase()} trend.`;
     const volatilityNote = volatility > 5 ? "high volatility, indicating potential for significant price swings" : "moderate volatility, suggesting relatively stable movement";
     const supportResistance = `Support is at $${support.toFixed(2)}, while resistance is at $${resistance.toFixed(2)}.`;
+    const volumeColor = volume < 1000000 ? "#ea384c" : "#F2FCE2";
+    const volumeStatus = volume < 1000000 ? "low" : "high";
 
     return (
       <>
@@ -25,9 +28,10 @@ const AnalysisDisplay = ({ analysis }: { analysis: CryptoAnalysis | null }) => {
           <li><strong>Moving Averages:</strong> {smaObservation}</li>
           <li><strong>Volatility:</strong> The 14-day volatility is $${volatility.toFixed(2)}, showing {volatilityNote}.</li>
           <li><strong>Key Levels:</strong> {supportResistance}</li>
+          <li style={{ color: volumeColor }}><strong>Volume Analysis:</strong> The trading volume is {volumeStatus} at {volume.toLocaleString()} units.</li>
         </ol>
         <p className="mt-2">
-          <strong>Conclusion:</strong> The chart appears to be {trend.toLowerCase()} based on the price trend and moving averages. However, monitor volatility and key levels, as they could signal a reversal or consolidation soon. Always combine this with broader market analysis before deciding. 🚀📈
+          <strong>Conclusion:</strong> The chart appears to be {trend.toLowerCase()} based on the price trend and moving averages. The {volumeStatus} volume suggests {volumeStatus === "high" ? "strong market participation" : "caution is needed"}. Monitor volatility and key levels, as they could signal a reversal or consolidation soon. Always combine this with broader market analysis before deciding. 🚀📈
         </p>
       </>
     );

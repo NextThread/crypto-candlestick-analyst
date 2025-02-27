@@ -9,12 +9,13 @@ export interface CryptoAnalysis {
   volatility: number;
   entryPoint: number;
   stopLoss: number;
-  target1: number; // 1:2 risk-reward
-  target2: number; // 1:3 risk-reward
-  target3: number; // 1:4 risk-reward
+  target1: number;
+  target2: number;
+  target3: number;
   exit: number;
   support: number;
   resistance: number;
+  volume: number;
 }
 
 function calculateSMA(prices: number[]): number {
@@ -43,6 +44,7 @@ export async function analyzeCrypto(cryptoName: string): Promise<CryptoAnalysis 
       `https://api.coingecko.com/api/v3/coins/${cryptoName}/market_chart?vs_currency=usd&days=30`
     );
     const prices = historicalResponse.data.prices.map((price: number[]) => price[1]);
+    const volumes = historicalResponse.data.total_volumes.map((vol: number[]) => vol[1]);
 
     const sma7 = calculateSMA(prices.slice(-7));
     const sma14 = calculateSMA(prices.slice(-14));
@@ -51,17 +53,15 @@ export async function analyzeCrypto(cryptoName: string): Promise<CryptoAnalysis 
     const support = Math.min(...prices);
     const resistance = Math.max(...prices);
     const volatility = calculateVolatility(prices.slice(-14));
+    const volume = volumes[volumes.length - 1];
 
     const entryPoint = currentPrice;
-    const riskPercentage = 0.05; // 5% below entry for stop loss
-    const stopLoss = entryPoint * (1 - riskPercentage); // e.g., 95 if entry is 100
-
-    // Calculate targets based on risk-reward ratios
-    const riskAmount = entryPoint - stopLoss; // e.g., 5 if entry is 100 and stop loss is 95
-    const target1 = entryPoint + riskAmount * 2; // 1:2 ratio (e.g., 110)
-    const target2 = entryPoint + riskAmount * 3; // 1:3 ratio (e.g., 115)
-    const target3 = entryPoint + riskAmount * 4; // 1:4 ratio (e.g., 120)
-
+    const riskPercentage = 0.05;
+    const stopLoss = entryPoint * (1 - riskPercentage);
+    const riskAmount = entryPoint - stopLoss;
+    const target1 = entryPoint + riskAmount * 2;
+    const target2 = entryPoint + riskAmount * 3;
+    const target3 = entryPoint + riskAmount * 4;
     const exit = trend === "Bullish" ? resistance * 0.98 : support * 1.02;
 
     return {
@@ -79,6 +79,7 @@ export async function analyzeCrypto(cryptoName: string): Promise<CryptoAnalysis 
       exit,
       support,
       resistance,
+      volume,
     };
   } catch (error) {
     console.error("Error analyzing crypto:", error);
