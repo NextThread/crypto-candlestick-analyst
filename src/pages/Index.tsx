@@ -6,7 +6,7 @@ import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Subscribe from "@/components/Subscribe";
 import FAQ from "@/components/FAQ";
-import { ArrowDown, Check } from "lucide-react";
+import { ArrowDown, Check, Instagram, Linkedin } from "lucide-react";
 import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 import { useState } from "react";
 import CryptoNews from "@/components/CryptoNews";
@@ -26,12 +26,30 @@ const Index = () => {
         <div className="container px-4 mx-auto">
           <div className="text-center mb-12 animate-fade-in">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
-              AI-Powered Crypto Analysis
+              AI-Powered Chart Analysis
             </h1>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
               Upload your chart or search for any cryptocurrency to get instant,
               AI-powered technical analysis and trading insights.
             </p>
+            <div className="flex items-center justify-center gap-4 mb-8">
+              <a
+                href="https://www.instagram.com/chartlyai/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-primary transition-colors"
+              >
+                <Instagram className="w-6 h-6" />
+              </a>
+              <a
+                href="https://www.linkedin.com/company/chartlyai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-primary transition-colors"
+              >
+                <Linkedin className="w-6 h-6" />
+              </a>
+            </div>
             <a
               href="#analysis"
               className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
@@ -72,13 +90,19 @@ const Index = () => {
       </div>
 
       {/* Crypto News Section */}
-      <CryptoNews />
+      <div id="news">
+        <CryptoNews />
+      </div>
 
       {/* Features */}
-      <Features />
+      <div id="features">
+        <Features />
+      </div>
 
       {/* Comparison Table */}
-      <ComparisonTable />
+      <div id="comparison">
+        <ComparisonTable />
+      </div>
 
       {/* Pricing Section */}
       <section className="py-20 bg-white/5">
@@ -176,7 +200,9 @@ const Index = () => {
       <Testimonials />
 
       {/* Contact */}
-      <Contact />
+      <div id="contact">
+        <Contact />
+      </div>
 
       {/* Subscribe */}
       <Subscribe />
