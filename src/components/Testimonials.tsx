@@ -1,4 +1,6 @@
 
+import { BadgeCheck } from "lucide-react";
+
 const Testimonials = () => {
   return (
     <section id="testimonials" className="py-20 bg-white/5">
@@ -10,8 +12,11 @@ const Testimonials = () => {
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-primary/20"></div>
               <div className="ml-3">
-                <h4 className="font-semibold">Alex Thompson</h4>
-                <p className="text-sm text-gray-400">Crypto Trader</p>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-semibold">Alex Thompson</h4>
+                  <BadgeCheck className="w-4 h-4 text-primary" />
+                </div>
+                <p className="text-sm text-gray-400">Verified Crypto Trader</p>
               </div>
             </div>
           </div>
@@ -20,8 +25,11 @@ const Testimonials = () => {
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-primary/20"></div>
               <div className="ml-3">
-                <h4 className="font-semibold">Sarah Chen</h4>
-                <p className="text-sm text-gray-400">Portfolio Manager</p>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-semibold">Sarah Chen</h4>
+                  <BadgeCheck className="w-4 h-4 text-primary" />
+                </div>
+                <p className="text-sm text-gray-400">Verified Portfolio Manager</p>
               </div>
             </div>
           </div>
@@ -30,8 +38,11 @@ const Testimonials = () => {
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-primary/20"></div>
               <div className="ml-3">
-                <h4 className="font-semibold">Michael Rodriguez</h4>
-                <p className="text-sm text-gray-400">Day Trader</p>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-semibold">Michael Rodriguez</h4>
+                  <BadgeCheck className="w-4 h-4 text-primary" />
+                </div>
+                <p className="text-sm text-gray-400">Verified Day Trader</p>
               </div>
             </div>
           </div>

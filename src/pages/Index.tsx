@@ -10,12 +10,17 @@ import { ArrowDown, Check } from "lucide-react";
 import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 import { useState } from "react";
 import CryptoNews from "@/components/CryptoNews";
+import SocialProofBanner from "@/components/SocialProofBanner";
+import ComparisonTable from "@/components/ComparisonTable";
+import ChatBot from "@/components/ChatBot";
 
 const Index = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+      <SocialProofBanner />
+      
       {/* Hero Section */}
       <div className="pt-24 pb-16">
         <div className="container px-4 mx-auto">
@@ -71,6 +76,9 @@ const Index = () => {
 
       {/* Features */}
       <Features />
+
+      {/* Comparison Table */}
+      <ComparisonTable />
 
       {/* Pricing Section */}
       <section className="py-20 bg-white/5">
@@ -179,6 +187,9 @@ const Index = () => {
           <p>&copy; 2025 CryptoAI. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* Chat Bot */}
+      <ChatBot />
     </div>
   );
 };
