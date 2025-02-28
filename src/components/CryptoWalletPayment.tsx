@@ -21,6 +21,7 @@ const CryptoWalletPayment = ({
   const [isPhantomAvailable, setIsPhantomAvailable] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
+  const [paymentPending, setPaymentPending] = useState(false);
   const { toast } = useToast();
 
   // Wallet addresses
@@ -67,8 +68,8 @@ const CryptoWalletPayment = ({
           )}`,
         });
         
-        // Proceed with payment
-        proceedWithPayment(accounts[0], "ethereum");
+        // Initiate Ethereum payment
+        await initiateEthereumPayment(accounts[0]);
       }
     } catch (error) {
       console.error("Error connecting to MetaMask:", error);
@@ -109,8 +110,8 @@ const CryptoWalletPayment = ({
             .substring(publicKey.toString().length - 4)}`,
         });
         
-        // Proceed with payment
-        proceedWithPayment(publicKey.toString(), "solana");
+        // Initiate Solana payment
+        await initiateSolanaPayment(publicKey.toString());
       }
     } catch (error) {
       console.error("Error connecting to Phantom:", error);
@@ -125,63 +126,137 @@ const CryptoWalletPayment = ({
     }
   };
 
-  const proceedWithPayment = async (account: string, network: "ethereum" | "solana") => {
-    setIsLoading(true);
+  const initiateEthereumPayment = async (fromAddress: string) => {
+    setPaymentPending(true);
     
     try {
-      // This is a simplified example. In a real app, you would:
-      // 1. Call your backend to generate transaction data
-      // 2. Have the user sign and send the transaction
-      // 3. Verify the transaction on the backend
+      // Convert dollar amount to ETH (simplified - in real app you would use an API for conversion)
+      // For demo purposes we'll use a fixed conversion rate (1 ETH = $2000 in this example)
+      const ethAmount = (amount / 2000).toFixed(6);
+      const weiAmount = `0x${(parseInt(ethAmount) * 1e18).toString(16)}`;
       
-      if (network === "ethereum") {
-        // Example Ethereum transaction (simplified)
+      toast({
+        title: "Payment Initiated",
+        description: `Please confirm the payment of ${ethAmount} ETH (~$${amount}) in your MetaMask wallet.`,
+      });
+      
+      // Prepare transaction parameters
+      const transactionParameters = {
+        to: ETHEREUM_WALLET_ADDRESS,
+        from: fromAddress,
+        value: weiAmount, // Value in wei
+        gas: '0x5208', // 21000 gas (standard tx)
+      };
+      
+      // Send transaction request to MetaMask
+      const txHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [transactionParameters],
+      });
+      
+      if (txHash) {
+        // Transaction was initiated and signed by the user
         toast({
-          title: "Processing Payment",
-          description: `Requesting payment of $${amount} to ${ETHEREUM_WALLET_ADDRESS.substring(0, 8)}...`,
+          title: "Transaction Submitted",
+          description: `Transaction hash: ${txHash.substring(0, 10)}...`,
         });
         
         // Store subscription details
         const subscriptionDetails = getSubscriptionDetails(planName);
         saveSubscription(subscriptionDetails);
         
-        // Simulating a successful payment after a short delay
-        setTimeout(() => {
-          toast({
-            title: "Payment Successful",
-            description: `Successfully subscribed to ${planName} plan! Valid for ${subscriptionDetails.duration} days.`,
-          });
-          if (onSuccess) onSuccess();
-        }, 2000);
-      } else if (network === "solana") {
-        // Example Solana transaction (simplified)
         toast({
-          title: "Processing Payment",
-          description: `Requesting payment of $${amount} to ${SOLANA_WALLET_ADDRESS.substring(0, 8)}...`,
+          title: "Payment Successful",
+          description: `Successfully subscribed to ${planName} plan! Valid for ${subscriptionDetails.duration} days.`,
         });
         
-        // Store subscription details
-        const subscriptionDetails = getSubscriptionDetails(planName);
-        saveSubscription(subscriptionDetails);
-        
-        // Simulating a successful payment after a short delay
-        setTimeout(() => {
-          toast({
-            title: "Payment Successful",
-            description: `Successfully subscribed to ${planName} plan! Valid for ${subscriptionDetails.duration} days.`,
-          });
-          if (onSuccess) onSuccess();
-        }, 2000);
+        if (onSuccess) onSuccess();
       }
     } catch (error) {
       console.error("Payment error:", error);
-      toast({
-        title: "Payment Failed",
-        description: "There was an error processing your payment. Please try again.",
-        variant: "destructive",
-      });
+      // Handle user rejection or other errors
+      if (error.code === 4001) {
+        toast({
+          title: "Payment Rejected",
+          description: "You rejected the transaction in your wallet.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Payment Failed",
+          description: "There was an error processing your payment. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
-      setIsLoading(false);
+      setPaymentPending(false);
+    }
+  };
+
+  const initiateSolanaPayment = async (fromAddress: string) => {
+    setPaymentPending(true);
+    
+    try {
+      // Convert dollar amount to SOL (simplified - in real app you would use an API for conversion)
+      // For demo purposes we'll use a fixed conversion rate (1 SOL = $100 in this example)
+      const solAmount = (amount / 100).toFixed(6);
+      
+      toast({
+        title: "Payment Initiated",
+        description: `Please confirm the payment of ${solAmount} SOL (~$${amount}) in your Phantom wallet.`,
+      });
+      
+      // Create the transaction
+      const connection = window.solana.connection;
+      
+      // Prepare the transaction
+      const transaction = new window.solana.Transaction().add(
+        window.solana.SystemProgram.transfer({
+          fromPubkey: new window.solana.PublicKey(fromAddress),
+          toPubkey: new window.solana.PublicKey(SOLANA_WALLET_ADDRESS),
+          lamports: solAmount * window.solana.LAMPORTS_PER_SOL,
+        })
+      );
+      
+      // Sign and send the transaction
+      const { signature } = await window.solana.signAndSendTransaction(transaction);
+      
+      if (signature) {
+        // Transaction was initiated and signed by the user
+        toast({
+          title: "Transaction Submitted",
+          description: `Transaction signature: ${signature.substring(0, 10)}...`,
+        });
+        
+        // Store subscription details
+        const subscriptionDetails = getSubscriptionDetails(planName);
+        saveSubscription(subscriptionDetails);
+        
+        toast({
+          title: "Payment Successful",
+          description: `Successfully subscribed to ${planName} plan! Valid for ${subscriptionDetails.duration} days.`,
+        });
+        
+        if (onSuccess) onSuccess();
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      // Handle user rejection or other errors
+      if (error.message.includes('User rejected')) {
+        toast({
+          title: "Payment Rejected",
+          description: "You rejected the transaction in your wallet.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Payment Failed",
+          description: "There was an error processing your payment. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setPaymentPending(false);
     }
   };
 
@@ -238,28 +313,34 @@ const CryptoWalletPayment = ({
       
       <Button
         onClick={connectMetaMask}
-        disabled={isLoading}
+        disabled={isLoading || paymentPending}
         variant="outline"
         className={`w-full justify-start ${activeWallet === "metamask" ? "border-primary" : ""}`}
       >
         <CircleDollarSign className="mr-2 h-4 w-4" />
-        {isMetaMaskAvailable ? "Pay with MetaMask" : "Install MetaMask"}
+        {isMetaMaskAvailable ? 
+          (paymentPending && activeWallet === "metamask" ? "Payment in Progress..." : "Pay with MetaMask") 
+          : "Install MetaMask"}
       </Button>
       
       <Button
         onClick={connectPhantom}
-        disabled={isLoading}
+        disabled={isLoading || paymentPending}
         variant="outline"
         className={`w-full justify-start ${activeWallet === "phantom" ? "border-primary" : ""}`}
       >
         <Wallet className="mr-2 h-4 w-4" />
-        {isPhantomAvailable ? "Pay with Phantom" : "Install Phantom"}
+        {isPhantomAvailable ? 
+          (paymentPending && activeWallet === "phantom" ? "Payment in Progress..." : "Pay with Phantom") 
+          : "Install Phantom"}
       </Button>
       
-      {isLoading && (
+      {(isLoading || paymentPending) && (
         <div className="text-center py-2">
           <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-primary border-r-transparent"></div>
-          <span className="ml-2 text-sm">Processing...</span>
+          <span className="ml-2 text-sm">
+            {paymentPending ? "Waiting for wallet confirmation..." : "Processing..."}
+          </span>
         </div>
       )}
     </div>
