@@ -3,33 +3,73 @@ import { useState, useRef, useEffect } from "react";
 import { ChartCandlestick, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@clerk/clerk-react";
+import SubscriptionAlert from "./SubscriptionAlert";
 
-const ANALYSIS_LIMIT = 3;
 const ANALYSIS_COUNT_KEY = "analysisCount";
 
 const ChartUpload = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [analysisCount, setAnalysisCount] = useState(0);
+  const [analysisLimit, setAnalysisLimit] = useState(3); // Default for free tier
+  const [showLimitAlert, setShowLimitAlert] = useState(false);
+  const [hasSubscription, setHasSubscription] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { user } = useUser();
 
   useEffect(() => {
     if (user) {
-      const storedCount = localStorage.getItem(`${ANALYSIS_COUNT_KEY}_${user.id}`);
+      const userId = user.id;
+      // Get current subscription
+      const subscriptionData = localStorage.getItem(`subscription_${userId}`);
+      if (subscriptionData) {
+        const subscription = JSON.parse(subscriptionData);
+        const endDate = new Date(subscription.endDate);
+        
+        // Check if subscription is still valid
+        if (endDate > new Date()) {
+          setHasSubscription(true);
+          
+          // Set analysis limit from subscription
+          const limitValue = localStorage.getItem(`analysisLimit_${userId}`);
+          if (limitValue) {
+            const limit = parseInt(limitValue);
+            setAnalysisLimit(limit === -1 ? Infinity : limit); // -1 means unlimited
+          }
+        } else {
+          // Subscription expired, revert to free tier
+          localStorage.removeItem(`subscription_${userId}`);
+          localStorage.removeItem(`analysisLimit_${userId}`);
+          setAnalysisLimit(3);
+          setHasSubscription(false);
+        }
+      }
+      
+      // Get analysis count
+      const storedCount = localStorage.getItem(`${ANALYSIS_COUNT_KEY}_${userId}`);
       if (storedCount) {
         setAnalysisCount(parseInt(storedCount));
       } else {
         setAnalysisCount(0);
-        localStorage.setItem(`${ANALYSIS_COUNT_KEY}_${user.id}`, "0");
+        localStorage.setItem(`${ANALYSIS_COUNT_KEY}_${userId}`, "0");
       }
     }
   }, [user]);
 
+  const incrementAnalysisCount = () => {
+    if (!user) return;
+    const newCount = analysisCount + 1;
+    setAnalysisCount(newCount);
+    localStorage.setItem(`${ANALYSIS_COUNT_KEY}_${user.id}`, newCount.toString());
+    if (newCount >= analysisLimit) {
+      setShowLimitAlert(true);
+    }
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    if (!user || analysisCount >= ANALYSIS_LIMIT) return;
+    if (!user || analysisCount >= analysisLimit) return;
     setIsDragging(true);
   };
 
@@ -50,12 +90,8 @@ const ChartUpload = () => {
       return;
     }
 
-    if (analysisCount >= ANALYSIS_LIMIT) {
-      toast({
-        title: "Analysis Limit Reached",
-        description: "Please subscribe to analyze more charts",
-        variant: "destructive",
-      });
+    if (analysisCount >= analysisLimit) {
+      setShowLimitAlert(true);
       return;
     }
     
@@ -75,12 +111,8 @@ const ChartUpload = () => {
       return;
     }
 
-    if (analysisCount >= ANALYSIS_LIMIT) {
-      toast({
-        title: "Analysis Limit Reached",
-        description: "Please subscribe to analyze more charts",
-        variant: "destructive",
-      });
+    if (analysisCount >= analysisLimit) {
+      setShowLimitAlert(true);
       return;
     }
 
@@ -100,6 +132,7 @@ const ChartUpload = () => {
       return;
     }
     setPreviewUrl(URL.createObjectURL(file));
+    incrementAnalysisCount();
   };
 
   const handleCameraCapture = async () => {
@@ -112,12 +145,8 @@ const ChartUpload = () => {
       return;
     }
 
-    if (analysisCount >= ANALYSIS_LIMIT) {
-      toast({
-        title: "Analysis Limit Reached",
-        description: "Please subscribe to analyze more charts",
-        variant: "destructive",
-      });
+    if (analysisCount >= analysisLimit) {
+      setShowLimitAlert(true);
       return;
     }
 
@@ -135,6 +164,7 @@ const ChartUpload = () => {
       setTimeout(() => {
         context?.drawImage(video, 0, 0, canvas.width, canvas.height);
         setPreviewUrl(canvas.toDataURL("image/png"));
+        incrementAnalysisCount();
         stream.getTracks().forEach((track) => track.stop());
       }, 2000);
     } catch (err) {
@@ -153,7 +183,7 @@ const ChartUpload = () => {
           ? "bg-primary/10 border-primary/50"
           : "bg-white/5 border-gray-200/20"
       } border-2 border-dashed backdrop-blur-sm ${
-        !user || analysisCount >= ANALYSIS_LIMIT ? "opacity-50 pointer-events-none" : ""
+        !user || analysisCount >= analysisLimit ? "opacity-50 pointer-events-none" : ""
       }`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -184,7 +214,7 @@ const ChartUpload = () => {
               <p className="text-sm text-gray-400">
                 {!user ? (
                   "Please sign in to analyze charts"
-                ) : analysisCount >= ANALYSIS_LIMIT ? (
+                ) : analysisCount >= analysisLimit ? (
                   "Analysis limit reached. Please subscribe to continue."
                 ) : (
                   <>
@@ -202,9 +232,9 @@ const ChartUpload = () => {
           </div>
           <button
             onClick={handleCameraCapture}
-            disabled={!user || analysisCount >= ANALYSIS_LIMIT}
+            disabled={!user || analysisCount >= analysisLimit}
             className={`flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors ${
-              !user || analysisCount >= ANALYSIS_LIMIT ? "opacity-50 cursor-not-allowed" : ""
+              !user || analysisCount >= analysisLimit ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             <Camera size={20} />
@@ -219,6 +249,13 @@ const ChartUpload = () => {
         className="hidden"
         onChange={handleFileInput}
       />
+      {showLimitAlert && (
+        <SubscriptionAlert 
+          isOpen={showLimitAlert}
+          onClose={() => setShowLimitAlert(false)}
+          hasSubscription={hasSubscription}
+        />
+      )}
     </div>
   );
 };

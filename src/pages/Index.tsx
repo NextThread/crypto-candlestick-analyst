@@ -8,8 +8,8 @@ import Contact from "@/components/Contact";
 import Subscribe from "@/components/Subscribe";
 import FAQ from "@/components/FAQ";
 import { ArrowDown, Check, Instagram, Linkedin } from "lucide-react";
-import { SignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
-import { useState } from "react";
+import { SignIn, SignedIn, SignedOut, useUser } from "@clerk/clerk-react";
+import { useState, useEffect } from "react";
 import CryptoNews from "@/components/CryptoNews";
 import SocialProofBanner from "@/components/SocialProofBanner";
 import ComparisonTable from "@/components/ComparisonTable";
@@ -22,6 +22,40 @@ const Index = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
   const [showPaymentFor, setShowPaymentFor] = useState<string | null>(null);
   const [successPlan, setSuccessPlan] = useState<string | null>(null);
+  const [subscriptions, setSubscriptions] = useState<Record<string, any>>({});
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      const userId = user.id;
+      // Get current subscription
+      const subscriptionData = localStorage.getItem(`subscription_${userId}`);
+      if (subscriptionData) {
+        try {
+          const subscription = JSON.parse(subscriptionData);
+          const endDate = new Date(subscription.endDate);
+          
+          // Check if subscription is still valid
+          if (endDate > new Date()) {
+            // Calculate days remaining
+            const daysRemaining = Math.ceil((endDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+            setSubscriptions({
+              ...subscriptions,
+              [subscription.plan.toLowerCase()]: {
+                ...subscription,
+                daysRemaining
+              }
+            });
+          } else {
+            // Subscription expired, remove it
+            localStorage.removeItem(`subscription_${userId}`);
+          }
+        } catch (error) {
+          console.error("Error parsing subscription data:", error);
+        }
+      }
+    }
+  }, [user, successPlan]);
 
   const handlePaymentSuccess = (planName: string) => {
     setShowPaymentFor(null);
@@ -30,6 +64,21 @@ const Index = () => {
 
   const handleSuccessClose = () => {
     setSuccessPlan(null);
+  };
+
+  // Calculate remaining days for a subscription
+  const getRemainingDays = (planType: string) => {
+    const plan = planType.toLowerCase();
+    if (subscriptions[plan]) {
+      return subscriptions[plan].daysRemaining;
+    }
+    return 0;
+  };
+
+  // Check if user has an active subscription
+  const hasActiveSubscription = (planType: string) => {
+    const plan = planType.toLowerCase();
+    return !!subscriptions[plan];
   };
 
   return (
@@ -152,6 +201,13 @@ const Index = () => {
                   planDescription="Monthly subscription" 
                   onSuccess={() => handlePaymentSuccess('Basic')}
                 />
+              ) : hasActiveSubscription('basic') ? (
+                <Button 
+                  className="w-full bg-gray-700 text-white hover:bg-gray-600 cursor-default"
+                  disabled
+                >
+                  {getRemainingDays('basic')} days remaining
+                </Button>
               ) : (
                 <Button 
                   onClick={() => setShowPaymentFor('basic')}
@@ -193,6 +249,13 @@ const Index = () => {
                   planDescription="6-month subscription" 
                   onSuccess={() => handlePaymentSuccess('Pro')}
                 />
+              ) : hasActiveSubscription('pro') ? (
+                <Button 
+                  className="w-full bg-gray-700 text-white hover:bg-gray-600 cursor-default"
+                  disabled
+                >
+                  {getRemainingDays('pro')} days remaining
+                </Button>
               ) : (
                 <Button 
                   onClick={() => setShowPaymentFor('pro')}
@@ -231,6 +294,13 @@ const Index = () => {
                   planDescription="Annual subscription" 
                   onSuccess={() => handlePaymentSuccess('Premium')}
                 />
+              ) : hasActiveSubscription('premium') ? (
+                <Button 
+                  className="w-full bg-gray-700 text-white hover:bg-gray-600 cursor-default"
+                  disabled
+                >
+                  {getRemainingDays('premium')} days remaining
+                </Button>
               ) : (
                 <Button 
                   onClick={() => setShowPaymentFor('premium')}

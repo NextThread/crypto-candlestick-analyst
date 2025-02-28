@@ -23,6 +23,10 @@ const CryptoWalletPayment = ({
   const [activeWallet, setActiveWallet] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Wallet addresses
+  const ETHEREUM_WALLET_ADDRESS = "0x58d298A676c31546895a04EfdF06Cb4AC9f43635";
+  const SOLANA_WALLET_ADDRESS = "HQo1gG52Ae7SUQAHND6ACJ8vFbboYHPpe49dFRP8KZuu";
+
   useEffect(() => {
     // Check for MetaMask availability
     if (window.ethereum) {
@@ -63,7 +67,7 @@ const CryptoWalletPayment = ({
           )}`,
         });
         
-        // You could proceed with a transaction here
+        // Proceed with payment
         proceedWithPayment(accounts[0], "ethereum");
       }
     } catch (error) {
@@ -105,7 +109,7 @@ const CryptoWalletPayment = ({
             .substring(publicKey.toString().length - 4)}`,
         });
         
-        // You could proceed with a transaction here
+        // Proceed with payment
         proceedWithPayment(publicKey.toString(), "solana");
       }
     } catch (error) {
@@ -132,17 +136,20 @@ const CryptoWalletPayment = ({
       
       if (network === "ethereum") {
         // Example Ethereum transaction (simplified)
-        // In a real app, you would need to specify proper transaction parameters
         toast({
           title: "Processing Payment",
-          description: `Requesting payment of $${amount} using Ethereum`,
+          description: `Requesting payment of $${amount} to ${ETHEREUM_WALLET_ADDRESS.substring(0, 8)}...`,
         });
+        
+        // Store subscription details
+        const subscriptionDetails = getSubscriptionDetails(planName);
+        saveSubscription(subscriptionDetails);
         
         // Simulating a successful payment after a short delay
         setTimeout(() => {
           toast({
             title: "Payment Successful",
-            description: `Successfully subscribed to ${planName} plan!`,
+            description: `Successfully subscribed to ${planName} plan! Valid for ${subscriptionDetails.duration} days.`,
           });
           if (onSuccess) onSuccess();
         }, 2000);
@@ -150,14 +157,18 @@ const CryptoWalletPayment = ({
         // Example Solana transaction (simplified)
         toast({
           title: "Processing Payment",
-          description: `Requesting payment of $${amount} using Solana`,
+          description: `Requesting payment of $${amount} to ${SOLANA_WALLET_ADDRESS.substring(0, 8)}...`,
         });
+        
+        // Store subscription details
+        const subscriptionDetails = getSubscriptionDetails(planName);
+        saveSubscription(subscriptionDetails);
         
         // Simulating a successful payment after a short delay
         setTimeout(() => {
           toast({
             title: "Payment Successful",
-            description: `Successfully subscribed to ${planName} plan!`,
+            description: `Successfully subscribed to ${planName} plan! Valid for ${subscriptionDetails.duration} days.`,
           });
           if (onSuccess) onSuccess();
         }, 2000);
@@ -171,6 +182,53 @@ const CryptoWalletPayment = ({
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Define subscription details based on plan
+  const getSubscriptionDetails = (plan: string) => {
+    let duration = 30; // days
+    let analysisLimit = 5; // per day
+    
+    switch (plan) {
+      case "Basic":
+        // $9/month - 5 analyses per day, 30 days
+        duration = 30;
+        analysisLimit = 5;
+        break;
+      case "Pro":
+        // $29/6 months - 20 analyses per day, 180 days
+        duration = 180;
+        analysisLimit = 20;
+        break;
+      case "Premium":
+        // $49/year - unlimited analyses, 365 days
+        duration = 365;
+        analysisLimit = -1; // -1 indicates unlimited
+        break;
+      default:
+        break;
+    }
+    
+    return {
+      plan,
+      duration,
+      analysisLimit,
+      startDate: new Date().toISOString(),
+      endDate: new Date(Date.now() + duration * 24 * 60 * 60 * 1000).toISOString(),
+    };
+  };
+
+  // Save subscription to localStorage
+  const saveSubscription = (subscriptionDetails: any) => {
+    if (window.localStorage && window.localStorage.getItem) {
+      // Store user ID with subscription if available
+      const userId = localStorage.getItem('userId') || 'anonymous';
+      localStorage.setItem(`subscription_${userId}`, JSON.stringify(subscriptionDetails));
+      localStorage.setItem(`analysisLimit_${userId}`, subscriptionDetails.analysisLimit.toString());
+      
+      // Reset the analysis count to 0 for the new subscription
+      localStorage.setItem(`analysisCount_${userId}`, "0");
     }
   };
 

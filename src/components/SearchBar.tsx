@@ -6,7 +6,6 @@ import { useToast } from "@/hooks/use-toast";
 import SubscriptionAlert from "./SubscriptionAlert";
 import { useUser } from "@clerk/clerk-react";
 
-const ANALYSIS_LIMIT = 3;
 const ANALYSIS_COUNT_KEY = "analysisCount";
 
 const SearchBar = ({ onAnalysisComplete }: { onAnalysisComplete: (analysis: any) => void }) => {
@@ -14,17 +13,46 @@ const SearchBar = ({ onAnalysisComplete }: { onAnalysisComplete: (analysis: any)
   const [searchQuery, setSearchQuery] = useState("");
   const [analysisCount, setAnalysisCount] = useState(0);
   const [showLimitAlert, setShowLimitAlert] = useState(false);
+  const [analysisLimit, setAnalysisLimit] = useState(3); // Default for free tier
+  const [hasSubscription, setHasSubscription] = useState(false);
   const { toast } = useToast();
   const { user } = useUser();
 
   useEffect(() => {
     if (user) {
-      const storedCount = localStorage.getItem(`${ANALYSIS_COUNT_KEY}_${user.id}`);
+      const userId = user.id;
+      // Get current subscription
+      const subscriptionData = localStorage.getItem(`subscription_${userId}`);
+      if (subscriptionData) {
+        const subscription = JSON.parse(subscriptionData);
+        const endDate = new Date(subscription.endDate);
+        
+        // Check if subscription is still valid
+        if (endDate > new Date()) {
+          setHasSubscription(true);
+          
+          // Set analysis limit from subscription
+          const limitValue = localStorage.getItem(`analysisLimit_${userId}`);
+          if (limitValue) {
+            const limit = parseInt(limitValue);
+            setAnalysisLimit(limit === -1 ? Infinity : limit); // -1 means unlimited
+          }
+        } else {
+          // Subscription expired, revert to free tier
+          localStorage.removeItem(`subscription_${userId}`);
+          localStorage.removeItem(`analysisLimit_${userId}`);
+          setAnalysisLimit(3);
+          setHasSubscription(false);
+        }
+      }
+      
+      // Get analysis count
+      const storedCount = localStorage.getItem(`${ANALYSIS_COUNT_KEY}_${userId}`);
       if (storedCount) {
         setAnalysisCount(parseInt(storedCount));
       } else {
         setAnalysisCount(0);
-        localStorage.setItem(`${ANALYSIS_COUNT_KEY}_${user.id}`, "0");
+        localStorage.setItem(`${ANALYSIS_COUNT_KEY}_${userId}`, "0");
       }
     }
   }, [user]);
@@ -34,7 +62,7 @@ const SearchBar = ({ onAnalysisComplete }: { onAnalysisComplete: (analysis: any)
     const newCount = analysisCount + 1;
     setAnalysisCount(newCount);
     localStorage.setItem(`${ANALYSIS_COUNT_KEY}_${user.id}`, newCount.toString());
-    if (newCount >= ANALYSIS_LIMIT) {
+    if (newCount >= analysisLimit) {
       setShowLimitAlert(true);
     }
   };
@@ -49,7 +77,7 @@ const SearchBar = ({ onAnalysisComplete }: { onAnalysisComplete: (analysis: any)
       return;
     }
 
-    if (analysisCount >= ANALYSIS_LIMIT) {
+    if (analysisCount >= analysisLimit) {
       setShowLimitAlert(true);
       return;
     }
@@ -101,15 +129,19 @@ const SearchBar = ({ onAnalysisComplete }: { onAnalysisComplete: (analysis: any)
         </div>
         <button
           onClick={handleAnalyze}
-          disabled={isAnalyzing || analysisCount >= ANALYSIS_LIMIT}
+          disabled={isAnalyzing || analysisCount >= analysisLimit}
           className={`px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 transition-colors whitespace-nowrap ${
-            isAnalyzing || analysisCount >= ANALYSIS_LIMIT ? "opacity-50 cursor-not-allowed" : ""
+            isAnalyzing || analysisCount >= analysisLimit ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
           {isAnalyzing ? "Analyzing..." : "Analyze"}
         </button>
       </div>
-      <SubscriptionAlert isOpen={showLimitAlert} />
+      <SubscriptionAlert 
+        isOpen={showLimitAlert} 
+        onClose={() => setShowLimitAlert(false)}
+        hasSubscription={hasSubscription}
+      />
     </>
   );
 };
