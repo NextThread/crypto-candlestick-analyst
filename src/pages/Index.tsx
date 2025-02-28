@@ -1,3 +1,4 @@
+
 import SearchBar from "@/components/SearchBar";
 import ChartUpload from "@/components/ChartUpload";
 import AnalysisDisplay from "@/components/AnalysisDisplay";
@@ -13,9 +14,22 @@ import CryptoNews from "@/components/CryptoNews";
 import SocialProofBanner from "@/components/SocialProofBanner";
 import ComparisonTable from "@/components/ComparisonTable";
 import ChatBot from "@/components/ChatBot";
+import CryptoWalletPayment from "@/components/CryptoWalletPayment";
+import SubscriptionSuccess from "@/components/SubscriptionSuccess";
 
 const Index = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [showPaymentFor, setShowPaymentFor] = useState<string | null>(null);
+  const [successPlan, setSuccessPlan] = useState<string | null>(null);
+
+  const handlePaymentSuccess = (planName: string) => {
+    setShowPaymentFor(null);
+    setSuccessPlan(planName);
+  };
+
+  const handleSuccessClose = () => {
+    setSuccessPlan(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
@@ -105,7 +119,7 @@ const Index = () => {
       </div>
 
       {/* Pricing Section */}
-      <section className="py-20 bg-white/5">
+      <section id="pricing" className="py-20 bg-white/5">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Choose Your Plan</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -130,9 +144,21 @@ const Index = () => {
                   <span>Standard support</span>
                 </li>
               </ul>
-              <button className="w-full py-2 px-4 rounded-lg bg-primary hover:bg-primary/90 transition-colors">
-                Get Started
-              </button>
+              {showPaymentFor === 'basic' ? (
+                <CryptoWalletPayment 
+                  amount={9} 
+                  planName="Basic" 
+                  planDescription="Monthly subscription" 
+                  onSuccess={() => handlePaymentSuccess('Basic')}
+                />
+              ) : (
+                <button 
+                  onClick={() => setShowPaymentFor('basic')}
+                  className="w-full py-2 px-4 rounded-lg bg-primary hover:bg-primary/90 transition-colors"
+                >
+                  Get Started
+                </button>
+              )}
             </div>
 
             {/* Pro Plan */}
@@ -159,9 +185,21 @@ const Index = () => {
                   <span>Priority support</span>
                 </li>
               </ul>
-              <button className="w-full py-2 px-4 rounded-lg bg-primary hover:bg-primary/90 transition-colors">
-                Get Started
-              </button>
+              {showPaymentFor === 'pro' ? (
+                <CryptoWalletPayment 
+                  amount={29} 
+                  planName="Pro" 
+                  planDescription="6-month subscription" 
+                  onSuccess={() => handlePaymentSuccess('Pro')}
+                />
+              ) : (
+                <button 
+                  onClick={() => setShowPaymentFor('pro')}
+                  className="w-full py-2 px-4 rounded-lg bg-primary hover:bg-primary/90 transition-colors"
+                >
+                  Get Started
+                </button>
+              )}
             </div>
 
             {/* Premium Plan */}
@@ -185,9 +223,21 @@ const Index = () => {
                   <span>24/7 premium support</span>
                 </li>
               </ul>
-              <button className="w-full py-2 px-4 rounded-lg bg-primary hover:bg-primary/90 transition-colors">
-                Get Started
-              </button>
+              {showPaymentFor === 'premium' ? (
+                <CryptoWalletPayment 
+                  amount={49} 
+                  planName="Premium" 
+                  planDescription="Annual subscription" 
+                  onSuccess={() => handlePaymentSuccess('Premium')}
+                />
+              ) : (
+                <button 
+                  onClick={() => setShowPaymentFor('premium')}
+                  className="w-full py-2 px-4 rounded-lg bg-primary hover:bg-primary/90 transition-colors"
+                >
+                  Get Started
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -216,6 +266,13 @@ const Index = () => {
 
       {/* Chat Bot */}
       <ChatBot />
+
+      {/* Subscription Success Dialog */}
+      <SubscriptionSuccess 
+        isOpen={!!successPlan} 
+        onClose={handleSuccessClose} 
+        planName={successPlan || ''}
+      />
     </div>
   );
 };
