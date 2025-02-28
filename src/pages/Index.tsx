@@ -16,6 +16,7 @@ import ComparisonTable from "@/components/ComparisonTable";
 import ChatBot from "@/components/ChatBot";
 import CryptoWalletPayment from "@/components/CryptoWalletPayment";
 import SubscriptionSuccess from "@/components/SubscriptionSuccess";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
@@ -152,12 +153,12 @@ const Index = () => {
                   onSuccess={() => handlePaymentSuccess('Basic')}
                 />
               ) : (
-                <button 
+                <Button 
                   onClick={() => setShowPaymentFor('basic')}
-                  className="w-full py-2 px-4 rounded-lg bg-primary hover:bg-primary/90 transition-colors"
+                  className="w-full"
                 >
                   Get Started
-                </button>
+                </Button>
               )}
             </div>
 
@@ -193,12 +194,12 @@ const Index = () => {
                   onSuccess={() => handlePaymentSuccess('Pro')}
                 />
               ) : (
-                <button 
+                <Button 
                   onClick={() => setShowPaymentFor('pro')}
-                  className="w-full py-2 px-4 rounded-lg bg-primary hover:bg-primary/90 transition-colors"
+                  className="w-full"
                 >
                   Get Started
-                </button>
+                </Button>
               )}
             </div>
 
@@ -231,12 +232,12 @@ const Index = () => {
                   onSuccess={() => handlePaymentSuccess('Premium')}
                 />
               ) : (
-                <button 
+                <Button 
                   onClick={() => setShowPaymentFor('premium')}
-                  className="w-full py-2 px-4 rounded-lg bg-primary hover:bg-primary/90 transition-colors"
+                  className="w-full"
                 >
                   Get Started
-                </button>
+                </Button>
               )}
             </div>
           </div>
