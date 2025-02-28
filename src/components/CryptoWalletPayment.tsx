@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Ethereum, Wallet } from "lucide-react";
+import { Wallet, CircleDollarSign } from "lucide-react";
 
 interface CryptoWalletPaymentProps {
   amount: number;
@@ -184,7 +184,7 @@ const CryptoWalletPayment = ({
         variant="outline"
         className={`w-full justify-start ${activeWallet === "metamask" ? "border-primary" : ""}`}
       >
-        <Ethereum className="mr-2 h-4 w-4" />
+        <CircleDollarSign className="mr-2 h-4 w-4" />
         {isMetaMaskAvailable ? "Pay with MetaMask" : "Install MetaMask"}
       </Button>
       
