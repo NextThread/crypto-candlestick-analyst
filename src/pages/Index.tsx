@@ -1,4 +1,3 @@
-
 import SearchBar from "@/components/SearchBar";
 import ChartUpload from "@/components/ChartUpload";
 import AnalysisDisplay from "@/components/AnalysisDisplay";
@@ -7,7 +6,7 @@ import Testimonials from "@/components/Testimonials";
 import Contact from "@/components/Contact";
 import Subscribe from "@/components/Subscribe";
 import FAQ from "@/components/FAQ";
-import { ArrowDown, Check, Instagram, Linkedin } from "lucide-react";
+import { ArrowDown, Check } from "lucide-react";
 import { SignIn, SignedIn, SignedOut, useUser } from "@clerk/clerk-react";
 import { useState, useEffect } from "react";
 import CryptoNews from "@/components/CryptoNews";
@@ -29,16 +28,13 @@ const Index = () => {
   useEffect(() => {
     if (user) {
       const userId = user.id;
-      // Get current subscription
       const subscriptionData = localStorage.getItem(`subscription_${userId}`);
       if (subscriptionData) {
         try {
           const subscription = JSON.parse(subscriptionData);
           const endDate = new Date(subscription.endDate);
           
-          // Check if subscription is still valid
           if (endDate > new Date()) {
-            // Calculate days remaining
             const daysRemaining = Math.ceil((endDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
             setSubscriptions({
               ...subscriptions,
@@ -48,7 +44,6 @@ const Index = () => {
               }
             });
           } else {
-            // Subscription expired, remove it
             localStorage.removeItem(`subscription_${userId}`);
           }
         } catch (error) {
@@ -67,7 +62,6 @@ const Index = () => {
     setSuccessPlan(null);
   };
 
-  // Calculate remaining days for a subscription
   const getRemainingDays = (planType: string) => {
     const plan = planType.toLowerCase();
     if (subscriptions[plan]) {
@@ -76,13 +70,11 @@ const Index = () => {
     return 0;
   };
 
-  // Check if user has an active subscription
   const hasActiveSubscription = (planType: string) => {
     const plan = planType.toLowerCase();
     return !!subscriptions[plan];
   };
 
-  // Basic plan options
   const basicPlans = [
     {
       id: "basic-1",
@@ -111,7 +103,6 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
       <SocialProofBanner />
       
-      {/* Hero Section */}
       <div className="pt-24 pb-16">
         <div className="container px-4 mx-auto">
           <div className="text-center mb-12 animate-fade-in">
@@ -122,24 +113,6 @@ const Index = () => {
               Upload your chart or search for any cryptocurrency to get instant,
               AI-powered technical analysis and trading insights.
             </p>
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <a
-                href="https://www.instagram.com/chartlyai/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-primary transition-colors"
-              >
-                <Instagram className="w-6 h-6" />
-              </a>
-              <a
-                href="https://www.linkedin.com/company/chartlyai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-primary transition-colors"
-              >
-                <Linkedin className="w-6 h-6" />
-              </a>
-            </div>
             <a
               href="#analysis"
               className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
@@ -151,7 +124,6 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Analysis Section */}
       <div id="analysis" className="py-16">
         <div className="container px-4 mx-auto">
           <div className="space-y-8 animate-fade-in" style={{ animationDelay: "200ms" }}>
@@ -179,28 +151,23 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Crypto News Section */}
       <div id="news">
         <CryptoNews />
       </div>
 
-      {/* Features */}
       <div id="features">
         <Features />
       </div>
 
-      {/* Comparison Table */}
       <div id="comparison">
         <ComparisonTable />
       </div>
 
-      {/* Pricing Section */}
       <section id="pricing" className="py-20 bg-white/5">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Choose Your Plan</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Basic Plan */}
-            <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-colors">
+            <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-colors card-shine">
               <div className="text-center mb-6">
                 <h3 className="text-xl font-semibold mb-2">Basic</h3>
                 <Tabs defaultValue="basic-1" className="w-full">
@@ -258,8 +225,7 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Pro Plan */}
-            <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border-2 border-primary relative">
+            <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border-2 border-primary relative card-shine">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm">
                 Most Popular
               </div>
@@ -306,8 +272,7 @@ const Index = () => {
               )}
             </div>
 
-            {/* Premium Plan */}
-            <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-colors">
+            <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-colors card-shine">
               <div className="text-center mb-6">
                 <h3 className="text-xl font-semibold mb-2">Premium</h3>
                 <div className="text-3xl font-bold mb-2">$49<span className="text-lg font-normal text-gray-400">/year</span></div>
@@ -354,31 +319,24 @@ const Index = () => {
         </div>
       </section>
 
-      {/* FAQ Section */}
       <FAQ />
 
-      {/* Testimonials */}
       <Testimonials />
 
-      {/* Contact */}
       <div id="contact">
         <Contact />
       </div>
 
-      {/* Subscribe */}
       <Subscribe />
 
-      {/* Footer */}
       <footer className="py-8 border-t border-gray-200/10">
         <div className="container mx-auto px-4 text-center text-gray-400">
           <p>&copy; 2025 CryptoAI. All rights reserved.</p>
         </div>
       </footer>
 
-      {/* Chat Bot */}
       <ChatBot />
 
-      {/* Subscription Success Dialog */}
       <SubscriptionSuccess 
         isOpen={!!successPlan} 
         onClose={handleSuccessClose} 

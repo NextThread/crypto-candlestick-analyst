@@ -63,10 +63,11 @@ const ComparisonTable = () => {
 
   return (
     <section className="py-20 relative overflow-hidden">
-      {/* Background effects */}
+      {/* Enhanced background effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
-      <div className="absolute top-0 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl opacity-20" />
-      <div className="absolute bottom-0 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl opacity-20" />
+      <div className="absolute top-0 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl opacity-20 animate-pulse" />
+      <div className="absolute bottom-0 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl opacity-20 animate-pulse" />
+      <div className="absolute top-1/3 left-1/4 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl opacity-10 animate-pulse" />
       
       <div className="container mx-auto px-4 relative z-10">
         <motion.h2 
@@ -132,7 +133,7 @@ const ComparisonTable = () => {
                     {feature.chartly ? (
                       <div className="flex justify-center">
                         <motion.div
-                          className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center"
+                          className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center glow-primary"
                           whileHover={{ scale: 1.2 }}
                           transition={{ type: "spring", stiffness: 400, damping: 10 }}
                         >
