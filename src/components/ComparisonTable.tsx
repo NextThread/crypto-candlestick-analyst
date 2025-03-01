@@ -63,7 +63,10 @@ const ComparisonTable = () => {
 
   return (
     <section className="py-20 relative overflow-hidden">
+      {/* Background effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+      <div className="absolute top-0 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl opacity-20" />
+      <div className="absolute bottom-0 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl opacity-20" />
       
       <div className="container mx-auto px-4 relative z-10">
         <motion.h2 
@@ -71,6 +74,7 @@ const ComparisonTable = () => {
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
         >
           Chartly AI vs Traditional Tools
         </motion.h2>
@@ -80,11 +84,12 @@ const ComparisonTable = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
         >
           See how our AI-powered platform outperforms traditional analysis tools in every category
         </motion.p>
         
-        <div className="max-w-4xl mx-auto overflow-x-auto glass p-1 rounded-xl">
+        <div className="max-w-4xl mx-auto overflow-x-auto glass p-1 rounded-xl border border-white/10 shadow-xl shadow-primary/5">
           <motion.table 
             className="w-full border-collapse"
             variants={containerVariants}
@@ -97,7 +102,10 @@ const ComparisonTable = () => {
                 <th className="p-6 text-left text-lg font-medium">Features</th>
                 <th className="p-6 text-center text-lg font-medium">
                   <div className="flex flex-col items-center">
-                    <span className="text-primary font-bold">Chartly AI</span>
+                    <span className="text-primary font-bold relative group">
+                      Chartly AI
+                      <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-primary to-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                    </span>
                     <span className="text-xs text-gray-400 mt-1">Next-Gen Analysis</span>
                   </div>
                 </th>
