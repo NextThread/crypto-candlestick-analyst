@@ -81,7 +81,7 @@ const CryptoWalletPayment = ({
       // Convert dollar amount to ETH (simplified - in real app you would use an API for conversion)
       // For demo purposes we'll use a fixed conversion rate (1 ETH = $2000 in this example)
       const ethAmount = (amount / 2000).toFixed(6);
-      const weiAmount = `0x${(parseInt(ethAmount) * 1e18).toString(16)}`;
+      const weiAmount = `0x${Math.floor(Number(ethAmount) * 1e18).toString(16)}`;
       
       toast({
         title: "Payment Initiated",
@@ -146,24 +146,30 @@ const CryptoWalletPayment = ({
     let duration = 30; // days
     let analysisLimit = 5; // per day
     
-    switch (plan) {
-      case "Basic":
-        // $9/month - 5 analyses per day, 30 days
+    // Parse plan name to handle the basic tier options
+    if (plan.startsWith("Basic")) {
+      if (plan.includes("3 analyses")) {
+        duration = 30;
+        analysisLimit = 3;
+      } else if (plan.includes("5 analyses")) {
         duration = 30;
         analysisLimit = 5;
-        break;
-      case "Pro":
-        // $29/6 months - 20 analyses per day, 180 days
-        duration = 180;
-        analysisLimit = 20;
-        break;
-      case "Premium":
-        // $49/year - unlimited analyses, 365 days
-        duration = 365;
-        analysisLimit = -1; // -1 indicates unlimited
-        break;
-      default:
-        break;
+      } else if (plan.includes("10 analyses")) {
+        duration = 30;
+        analysisLimit = 10;
+      } else {
+        // Default basic plan
+        duration = 30;
+        analysisLimit = 5;
+      }
+    } else if (plan === "Pro") {
+      // $29/6 months - 20 analyses per day, 180 days
+      duration = 180;
+      analysisLimit = 20;
+    } else if (plan === "Premium") {
+      // $49/year - unlimited analyses, 365 days
+      duration = 365;
+      analysisLimit = -1; // -1 indicates unlimited
     }
     
     return {

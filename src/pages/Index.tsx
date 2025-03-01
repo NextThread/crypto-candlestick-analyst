@@ -17,6 +17,7 @@ import ChatBot from "@/components/ChatBot";
 import CryptoWalletPayment from "@/components/CryptoWalletPayment";
 import SubscriptionSuccess from "@/components/SubscriptionSuccess";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
@@ -80,6 +81,31 @@ const Index = () => {
     const plan = planType.toLowerCase();
     return !!subscriptions[plan];
   };
+
+  // Basic plan options
+  const basicPlans = [
+    {
+      id: "basic-1",
+      price: 4,
+      name: "Basic - 3 analyses",
+      analyses: 3,
+      fullName: "Basic (3 analyses per day)"
+    },
+    {
+      id: "basic-2",
+      price: 7,
+      name: "Basic - 5 analyses",
+      analyses: 5,
+      fullName: "Basic (5 analyses per day)"
+    },
+    {
+      id: "basic-3",
+      price: 9,
+      name: "Basic - 10 analyses",
+      analyses: 10,
+      fullName: "Basic (10 analyses per day)"
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
@@ -177,45 +203,59 @@ const Index = () => {
             <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-colors">
               <div className="text-center mb-6">
                 <h3 className="text-xl font-semibold mb-2">Basic</h3>
-                <div className="text-3xl font-bold mb-2">$9<span className="text-lg font-normal text-gray-400">/month</span></div>
-                <p className="text-gray-400">Perfect for getting started</p>
+                <Tabs defaultValue="basic-1" className="w-full">
+                  <TabsList className="grid grid-cols-3 mb-4">
+                    <TabsTrigger value="basic-1">$4</TabsTrigger>
+                    <TabsTrigger value="basic-2">$7</TabsTrigger>
+                    <TabsTrigger value="basic-3">$9</TabsTrigger>
+                  </TabsList>
+                  
+                  {basicPlans.map((plan) => (
+                    <TabsContent key={plan.id} value={plan.id} className="space-y-6">
+                      <div className="text-3xl font-bold mb-2">${plan.price}<span className="text-lg font-normal text-gray-400">/month</span></div>
+                      <p className="text-gray-400">Perfect for getting started</p>
+                      
+                      <ul className="space-y-3 mb-6">
+                        <li className="flex items-center gap-2 text-gray-300">
+                          <Check className="w-5 h-5 text-primary" />
+                          <span>Basic market analysis</span>
+                        </li>
+                        <li className="flex items-center gap-2 text-gray-300">
+                          <Check className="w-5 h-5 text-primary" />
+                          <span>{plan.analyses} chart uploads per day</span>
+                        </li>
+                        <li className="flex items-center gap-2 text-gray-300">
+                          <Check className="w-5 h-5 text-primary" />
+                          <span>Standard support</span>
+                        </li>
+                      </ul>
+                      
+                      {showPaymentFor === plan.id ? (
+                        <CryptoWalletPayment 
+                          amount={plan.price} 
+                          planName={plan.fullName} 
+                          planDescription="Monthly subscription" 
+                          onSuccess={() => handlePaymentSuccess(plan.fullName)}
+                        />
+                      ) : hasActiveSubscription(plan.fullName.toLowerCase()) ? (
+                        <Button 
+                          className="w-full bg-gray-700 text-white hover:bg-gray-600 cursor-default"
+                          disabled
+                        >
+                          {getRemainingDays(plan.fullName.toLowerCase())} days remaining
+                        </Button>
+                      ) : (
+                        <Button 
+                          onClick={() => setShowPaymentFor(plan.id)}
+                          className="w-full"
+                        >
+                          Get Started
+                        </Button>
+                      )}
+                    </TabsContent>
+                  ))}
+                </Tabs>
               </div>
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-center gap-2 text-gray-300">
-                  <Check className="w-5 h-5 text-primary" />
-                  <span>Basic market analysis</span>
-                </li>
-                <li className="flex items-center gap-2 text-gray-300">
-                  <Check className="w-5 h-5 text-primary" />
-                  <span>5 chart uploads per day</span>
-                </li>
-                <li className="flex items-center gap-2 text-gray-300">
-                  <Check className="w-5 h-5 text-primary" />
-                  <span>Standard support</span>
-                </li>
-              </ul>
-              {showPaymentFor === 'basic' ? (
-                <CryptoWalletPayment 
-                  amount={9} 
-                  planName="Basic" 
-                  planDescription="Monthly subscription" 
-                  onSuccess={() => handlePaymentSuccess('Basic')}
-                />
-              ) : hasActiveSubscription('basic') ? (
-                <Button 
-                  className="w-full bg-gray-700 text-white hover:bg-gray-600 cursor-default"
-                  disabled
-                >
-                  {getRemainingDays('basic')} days remaining
-                </Button>
-              ) : (
-                <Button 
-                  onClick={() => setShowPaymentFor('basic')}
-                  className="w-full"
-                >
-                  Get Started
-                </Button>
-              )}
             </div>
 
             {/* Pro Plan */}
