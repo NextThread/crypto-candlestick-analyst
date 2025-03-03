@@ -4,14 +4,19 @@ import { useEffect, useState } from "react";
 const TOTAL_CHARTS_ANALYZED_KEY = "total_charts_analyzed";
 const TOTAL_REGISTERED_USERS_KEY = "total_registered_users";
 
-// Function to get or initialize count
+// Function to get or initialize count from localStorage
 const getOrInitCount = (key: string, initialValue: number): number => {
-  const storedValue = localStorage.getItem(key);
-  if (storedValue === null) {
-    localStorage.setItem(key, initialValue.toString());
+  try {
+    const storedValue = localStorage.getItem(key);
+    if (storedValue === null) {
+      localStorage.setItem(key, initialValue.toString());
+      return initialValue;
+    }
+    return parseInt(storedValue);
+  } catch (error) {
+    console.error("Error accessing localStorage:", error);
     return initialValue;
   }
-  return parseInt(storedValue);
 };
 
 // Function to increment count
@@ -28,7 +33,7 @@ export const incrementCount = (key: string): number => {
 
 // Hook to get real-time count
 export const useRealtimeCount = (key: string, initialValue: number): number => {
-  const [count, setCount] = useState<number>(getOrInitCount(key, initialValue));
+  const [count, setCount] = useState<number>(() => getOrInitCount(key, initialValue));
   
   useEffect(() => {
     const handleCountUpdated = (event: CustomEvent) => {

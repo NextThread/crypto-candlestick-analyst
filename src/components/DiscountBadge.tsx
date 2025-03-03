@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 const DiscountBadge = () => {
   return (
     <motion.div 
-      className="absolute -top-5 -right-5 bg-gradient-to-r from-amber-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg flex items-center gap-1 whitespace-nowrap z-10"
+      className="absolute bottom-4 right-4 bg-gradient-to-r from-amber-500 to-red-500 text-white h-16 w-16 rounded-full shadow-lg flex flex-col items-center justify-center z-10 rotate-12"
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ 
@@ -14,10 +14,14 @@ const DiscountBadge = () => {
         damping: 10,
         duration: 0.5 
       }}
+      whileHover={{ 
+        scale: 1.1,
+        rotate: 0,
+        transition: { duration: 0.2 }
+      }}
     >
-      <BadgePercent className="w-4 h-4" />
-      <span>30% OFF</span>
-      <span className="text-xs font-normal">Limited Time</span>
+      <BadgePercent className="w-5 h-5 mb-0.5" />
+      <span className="text-xs font-bold">30% OFF</span>
     </motion.div>
   );
 };
