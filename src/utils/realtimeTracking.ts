@@ -21,7 +21,7 @@ const getOrInitCount = (key: string, initialValue: number): number => {
 
 // Function to increment count
 export const incrementCount = (key: string): number => {
-  const currentCount = getOrInitCount(key, key === TOTAL_CHARTS_ANALYZED_KEY ? 12457 : 5843);
+  const currentCount = getOrInitCount(key, key === TOTAL_CHARTS_ANALYZED_KEY ? 153427 : 5843);
   const newCount = currentCount + 1;
   localStorage.setItem(key, newCount.toString());
   
@@ -61,7 +61,7 @@ export const incrementRegisteredUsers = (): number => {
 };
 
 export const useChartAnalyzedCount = (): number => {
-  return useRealtimeCount(TOTAL_CHARTS_ANALYZED_KEY, 12457);
+  return useRealtimeCount(TOTAL_CHARTS_ANALYZED_KEY, 153427);
 };
 
 export const useRegisteredUsersCount = (): number => {

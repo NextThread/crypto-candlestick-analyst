@@ -254,7 +254,7 @@ const Index = () => {
                   {getRemainingDays("pro")} days remaining
                 </div>
               )}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm">
+              <div className="absolute -top-1 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm">
                 Most Popular
               </div>
               <div className="text-center mb-6">
