@@ -226,7 +226,7 @@ const Index = () => {
             </div>
 
             <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border-2 border-primary relative card-shine">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm">
+              <div className="absolute -top-0.1 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm">
                 Most Popular
               </div>
               <div className="text-center mb-6">
