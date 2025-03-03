@@ -17,11 +17,36 @@ const DiscountBadge = () => {
       whileHover={{ 
         scale: 1.1,
         rotate: 0,
+        boxShadow: "0 0 20px rgba(251, 113, 133, 0.6)",
         transition: { duration: 0.2 }
       }}
     >
-      <BadgePercent className="w-5 h-5 mb-0.5" />
-      <span className="text-xs font-bold">30% OFF</span>
+      <motion.div
+        animate={{
+          rotate: [0, 10, 0, -10, 0],
+        }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          repeatType: "loop",
+          ease: "easeInOut"
+        }}
+      >
+        <BadgePercent className="w-5 h-5 mb-0.5" />
+        <span className="text-xs font-bold">30% OFF</span>
+      </motion.div>
+      <motion.div 
+        className="absolute inset-0 rounded-full border-2 border-white/30"
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.7, 0.3, 0.7]
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          repeatType: "reverse"
+        }}
+      />
     </motion.div>
   );
 };
