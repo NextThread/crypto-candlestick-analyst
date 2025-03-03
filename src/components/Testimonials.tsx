@@ -225,8 +225,6 @@ const Testimonials = () => {
                   initial="initial"
                   whileHover="hover"
                   variants={imageVariants}
-                  animate="animate"
-                  variants={glowVariants}
                 >
                   <img 
                     src={testimonial.image} 
