@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -22,11 +21,9 @@ const CryptoWalletPayment = ({
   const [paymentPending, setPaymentPending] = useState(false);
   const { toast } = useToast();
 
-  // Wallet address
   const ETHEREUM_WALLET_ADDRESS = "0x58d298A676c31546895a04EfdF06Cb4AC9f43635";
 
   useEffect(() => {
-    // Check for MetaMask availability
     if (window.ethereum) {
       setIsMetaMaskAvailable(true);
     }
@@ -46,7 +43,6 @@ const CryptoWalletPayment = ({
     setIsLoading(true);
 
     try {
-      // Request account access
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
@@ -59,7 +55,6 @@ const CryptoWalletPayment = ({
           )}`,
         });
         
-        // Initiate Ethereum payment
         await initiateEthereumPayment(accounts[0]);
       }
     } catch (error) {
@@ -78,8 +73,6 @@ const CryptoWalletPayment = ({
     setPaymentPending(true);
     
     try {
-      // Convert dollar amount to ETH (simplified - in real app you would use an API for conversion)
-      // For demo purposes we'll use a fixed conversion rate (1 ETH = $2000 in this example)
       const ethAmount = (amount / 2000).toFixed(6);
       const weiAmount = `0x${Math.floor(Number(ethAmount) * 1e18).toString(16)}`;
       
@@ -88,28 +81,24 @@ const CryptoWalletPayment = ({
         description: `Please confirm the payment of ${ethAmount} ETH (~$${amount}) in your MetaMask wallet.`,
       });
       
-      // Prepare transaction parameters
       const transactionParameters = {
         to: ETHEREUM_WALLET_ADDRESS,
         from: fromAddress,
-        value: weiAmount, // Value in wei
-        gas: '0x5208', // 21000 gas (standard tx)
+        value: weiAmount,
+        gas: '0x5208',
       };
       
-      // Send transaction request to MetaMask
       const txHash = await window.ethereum.request({
         method: 'eth_sendTransaction',
         params: [transactionParameters],
       });
       
       if (txHash) {
-        // Transaction was initiated and signed by the user
         toast({
           title: "Transaction Submitted",
           description: `Transaction hash: ${txHash.substring(0, 10)}...`,
         });
         
-        // Store subscription details
         const subscriptionDetails = getSubscriptionDetails(planName);
         saveSubscription(subscriptionDetails);
         
@@ -122,7 +111,6 @@ const CryptoWalletPayment = ({
       }
     } catch (error) {
       console.error("Payment error:", error);
-      // Handle user rejection or other errors
       if (error.code === 4001) {
         toast({
           title: "Payment Rejected",
@@ -141,12 +129,10 @@ const CryptoWalletPayment = ({
     }
   };
 
-  // Define subscription details based on plan
   const getSubscriptionDetails = (plan: string) => {
-    let duration = 30; // days
-    let analysisLimit = 5; // per day
+    let duration = 30;
+    let analysisLimit = 5;
     
-    // Parse plan name to handle the basic tier options
     if (plan.startsWith("Basic")) {
       if (plan.includes("3 analyses")) {
         duration = 30;
@@ -158,18 +144,15 @@ const CryptoWalletPayment = ({
         duration = 30;
         analysisLimit = 10;
       } else {
-        // Default basic plan
         duration = 30;
         analysisLimit = 5;
       }
     } else if (plan === "Pro") {
-      // $29/6 months - 20 analyses per day, 180 days
       duration = 180;
       analysisLimit = 20;
     } else if (plan === "Premium") {
-      // $49/year - unlimited analyses, 365 days
       duration = 365;
-      analysisLimit = -1; // -1 indicates unlimited
+      analysisLimit = -1;
     }
     
     return {
@@ -181,17 +164,21 @@ const CryptoWalletPayment = ({
     };
   };
 
-  // Save subscription to localStorage
   const saveSubscription = (subscriptionDetails: any) => {
     if (window.localStorage && window.localStorage.getItem) {
-      // Store user ID with subscription if available
       const userId = localStorage.getItem('userId') || 'anonymous';
       localStorage.setItem(`subscription_${userId}`, JSON.stringify(subscriptionDetails));
       localStorage.setItem(`analysisLimit_${userId}`, subscriptionDetails.analysisLimit.toString());
       
-      // Reset the analysis count to 0 for the new subscription
       localStorage.setItem(`analysisCount_${userId}`, "0");
+      
+      resetAnalysisCountInUI();
     }
+  };
+
+  const resetAnalysisCountInUI = () => {
+    const event = new CustomEvent('subscriptionUpdated');
+    window.dispatchEvent(event);
   };
 
   return (

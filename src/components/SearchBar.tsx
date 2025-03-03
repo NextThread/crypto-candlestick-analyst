@@ -1,4 +1,3 @@
-
 import { Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { analyzeCrypto } from "@/utils/cryptoAnalysis";
@@ -21,42 +20,55 @@ const SearchBar = ({ onAnalysisComplete }: { onAnalysisComplete: (analysis: any)
 
   useEffect(() => {
     if (user) {
-      const userId = user.id;
-      // Get current subscription
-      const subscriptionData = localStorage.getItem(`subscription_${userId}`);
-      if (subscriptionData) {
-        const subscription = JSON.parse(subscriptionData);
-        const endDate = new Date(subscription.endDate);
-        
-        // Check if subscription is still valid
-        if (endDate > new Date()) {
-          setHasSubscription(true);
-          
-          // Set analysis limit from subscription
-          const limitValue = localStorage.getItem(`analysisLimit_${userId}`);
-          if (limitValue) {
-            const limit = parseInt(limitValue);
-            setAnalysisLimit(limit === -1 ? Infinity : limit); // -1 means unlimited
-          }
-        } else {
-          // Subscription expired, revert to free tier
-          localStorage.removeItem(`subscription_${userId}`);
-          localStorage.removeItem(`analysisLimit_${userId}`);
-          setAnalysisLimit(3);
-          setHasSubscription(false);
-        }
-      }
+      loadUserSubscriptionData();
+    }
+    
+    // Add event listener for subscription updates
+    window.addEventListener('subscriptionUpdated', loadUserSubscriptionData);
+    
+    return () => {
+      window.removeEventListener('subscriptionUpdated', loadUserSubscriptionData);
+    };
+  }, [user]);
+  
+  const loadUserSubscriptionData = () => {
+    if (!user) return;
+    
+    const userId = user.id;
+    // Get current subscription
+    const subscriptionData = localStorage.getItem(`subscription_${userId}`);
+    if (subscriptionData) {
+      const subscription = JSON.parse(subscriptionData);
+      const endDate = new Date(subscription.endDate);
       
-      // Get analysis count
-      const storedCount = localStorage.getItem(`${ANALYSIS_COUNT_KEY}_${userId}`);
-      if (storedCount) {
-        setAnalysisCount(parseInt(storedCount));
+      // Check if subscription is still valid
+      if (endDate > new Date()) {
+        setHasSubscription(true);
+        
+        // Set analysis limit from subscription
+        const limitValue = localStorage.getItem(`analysisLimit_${userId}`);
+        if (limitValue) {
+          const limit = parseInt(limitValue);
+          setAnalysisLimit(limit === -1 ? Infinity : limit); // -1 means unlimited
+        }
       } else {
-        setAnalysisCount(0);
-        localStorage.setItem(`${ANALYSIS_COUNT_KEY}_${userId}`, "0");
+        // Subscription expired, revert to free tier
+        localStorage.removeItem(`subscription_${userId}`);
+        localStorage.removeItem(`analysisLimit_${userId}`);
+        setAnalysisLimit(3);
+        setHasSubscription(false);
       }
     }
-  }, [user]);
+    
+    // Get analysis count
+    const storedCount = localStorage.getItem(`${ANALYSIS_COUNT_KEY}_${userId}`);
+    if (storedCount) {
+      setAnalysisCount(parseInt(storedCount));
+    } else {
+      setAnalysisCount(0);
+      localStorage.setItem(`${ANALYSIS_COUNT_KEY}_${userId}`, "0");
+    }
+  };
 
   const incrementAnalysisCount = () => {
     if (!user) return;

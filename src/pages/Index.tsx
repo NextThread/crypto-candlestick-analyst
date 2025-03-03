@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RealtimeStats from "@/components/RealtimeStats";
 import DiscountBadge from "@/components/DiscountBadge";
+import SubscriberBadge from "@/components/DiscountBadge";
 import { incrementRegisteredUsers } from "@/utils/realtimeTracking";
 
 const Index = () => {
@@ -183,7 +184,12 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-center mb-12">Choose Your Plan</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-colors card-shine relative">
-              <DiscountBadge />
+              <SubscriberBadge count={127} planName="Basic" />
+              {hasActiveSubscription("Basic (3 analyses per day)") && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-sm z-10">
+                  {getRemainingDays("Basic (3 analyses per day)")} days remaining
+                </div>
+              )}
               <div className="text-center mb-6">
                 <h3 className="text-xl font-semibold mb-2">Basic</h3>
                 <Tabs defaultValue="basic-1" className="w-full">
@@ -242,8 +248,13 @@ const Index = () => {
             </div>
 
             <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border-2 border-primary relative card-shine">
-              <DiscountBadge />
-              <div className="absolute -top-0.1 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm">
+              <SubscriberBadge count={358} planName="Pro" />
+              {hasActiveSubscription("pro") && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-sm z-10">
+                  {getRemainingDays("pro")} days remaining
+                </div>
+              )}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm">
                 Most Popular
               </div>
               <div className="text-center mb-6">
@@ -290,7 +301,12 @@ const Index = () => {
             </div>
 
             <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-colors card-shine relative">
-              <DiscountBadge />
+              <SubscriberBadge count={84} planName="Premium" />
+              {hasActiveSubscription("premium") && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-sm z-10">
+                  {getRemainingDays("premium")} days remaining
+                </div>
+              )}
               <div className="text-center mb-6">
                 <h3 className="text-xl font-semibold mb-2">Premium</h3>
                 <div className="text-3xl font-bold mb-2">$49<span className="text-lg font-normal text-gray-400">/year</span></div>
