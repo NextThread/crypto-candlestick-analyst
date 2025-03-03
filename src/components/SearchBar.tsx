@@ -5,6 +5,7 @@ import { analyzeCrypto } from "@/utils/cryptoAnalysis";
 import { useToast } from "@/hooks/use-toast";
 import SubscriptionAlert from "./SubscriptionAlert";
 import { useUser } from "@clerk/clerk-react";
+import { incrementChartAnalyzed } from "@/utils/realtimeTracking";
 
 const ANALYSIS_COUNT_KEY = "analysisCount";
 
@@ -97,6 +98,8 @@ const SearchBar = ({ onAnalysisComplete }: { onAnalysisComplete: (analysis: any)
       if (analysis) {
         onAnalysisComplete(analysis);
         incrementAnalysisCount();
+        // Increment the global chart analyzed count
+        incrementChartAnalyzed();
         toast({
           title: "Analysis Complete",
           description: "Check the results on the right",

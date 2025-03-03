@@ -17,6 +17,9 @@ import CryptoWalletPayment from "@/components/CryptoWalletPayment";
 import SubscriptionSuccess from "@/components/SubscriptionSuccess";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import RealtimeStats from "@/components/RealtimeStats";
+import DiscountBadge from "@/components/DiscountBadge";
+import { incrementRegisteredUsers } from "@/utils/realtimeTracking";
 
 const Index = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
@@ -52,6 +55,16 @@ const Index = () => {
       }
     }
   }, [user, successPlan]);
+
+  useEffect(() => {
+    if (user) {
+      const isNewUser = !localStorage.getItem(`registered_${user.id}`);
+      if (isNewUser) {
+        incrementRegisteredUsers();
+        localStorage.setItem(`registered_${user.id}`, "true");
+      }
+    }
+  }, [user]);
 
   const handlePaymentSuccess = (planName: string) => {
     setShowPaymentFor(null);
@@ -124,6 +137,8 @@ const Index = () => {
         </div>
       </div>
 
+      <RealtimeStats />
+
       <div id="analysis" className="py-16">
         <div className="container px-4 mx-auto">
           <div className="space-y-8 animate-fade-in" style={{ animationDelay: "200ms" }}>
@@ -167,7 +182,8 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Choose Your Plan</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-colors card-shine">
+            <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-colors card-shine relative">
+              <DiscountBadge />
               <div className="text-center mb-6">
                 <h3 className="text-xl font-semibold mb-2">Basic</h3>
                 <Tabs defaultValue="basic-1" className="w-full">
@@ -226,6 +242,7 @@ const Index = () => {
             </div>
 
             <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border-2 border-primary relative card-shine">
+              <DiscountBadge />
               <div className="absolute -top-0.1 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm">
                 Most Popular
               </div>
@@ -272,7 +289,8 @@ const Index = () => {
               )}
             </div>
 
-            <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-colors card-shine">
+            <div className="p-6 rounded-xl bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-colors card-shine relative">
+              <DiscountBadge />
               <div className="text-center mb-6">
                 <h3 className="text-xl font-semibold mb-2">Premium</h3>
                 <div className="text-3xl font-bold mb-2">$49<span className="text-lg font-normal text-gray-400">/year</span></div>

@@ -1,9 +1,9 @@
-
 import { useState, useRef, useEffect } from "react";
 import { ChartCandlestick, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@clerk/clerk-react";
 import SubscriptionAlert from "./SubscriptionAlert";
+import { incrementChartAnalyzed } from "@/utils/realtimeTracking";
 
 const ANALYSIS_COUNT_KEY = "analysisCount";
 
@@ -133,6 +133,7 @@ const ChartUpload = () => {
     }
     setPreviewUrl(URL.createObjectURL(file));
     incrementAnalysisCount();
+    incrementChartAnalyzed();
   };
 
   const handleCameraCapture = async () => {
@@ -165,6 +166,7 @@ const ChartUpload = () => {
         context?.drawImage(video, 0, 0, canvas.width, canvas.height);
         setPreviewUrl(canvas.toDataURL("image/png"));
         incrementAnalysisCount();
+        incrementChartAnalyzed();
         stream.getTracks().forEach((track) => track.stop());
       }, 2000);
     } catch (err) {
