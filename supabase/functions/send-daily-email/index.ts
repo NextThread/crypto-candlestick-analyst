@@ -20,15 +20,18 @@ interface CryptoPrice {
 
 async function fetchCryptoPrices(): Promise<CryptoPrice[]> {
   try {
+    console.log("Fetching crypto prices from CoinGecko API...");
     const response = await fetch(
       "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana&order=market_cap_desc"
     );
     
     if (!response.ok) {
+      console.error(`CoinGecko API returned status ${response.status}: ${response.statusText}`);
       throw new Error(`API returned status ${response.status}`);
     }
     
     const data = await response.json();
+    console.log(`Successfully fetched data for ${data.length} cryptocurrencies`);
     
     return data.map((coin: any) => ({
       name: coin.name,
@@ -48,11 +51,16 @@ async function fetchCryptoPrices(): Promise<CryptoPrice[]> {
 
 async function getAllUsers() {
   try {
+    console.log("Fetching users from database...");
     const { data, error } = await supabase
       .from('profiles')
       .select('*');
     
-    if (error) throw error;
+    if (error) {
+      console.error("Error fetching users:", error);
+      throw error;
+    }
+    console.log(`Found ${data?.length || 0} users in the database`);
     return data || [];
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -134,6 +142,8 @@ async function sendEmailToUser(user: any, cryptoPrices: CryptoPrice[]) {
     const userName = user.first_name || "Trader";
     const html = generateEmailHtml(userName, cryptoPrices);
     
+    console.log(`Sending email to ${user.email} (${userName})...`);
+    
     const emailResponse = await resend.emails.send({
       from: "ChartAI Team <chartaiteam@gmail.com>",
       to: [user.email],
@@ -156,12 +166,15 @@ const handler = async (req: Request): Promise<Response> => {
   }
   
   try {
+    console.log("Daily email function started at:", new Date().toISOString());
+    
     // For manual testing through HTTP requests
     let forceAll = false;
     
     if (req.method === "POST") {
       const body = await req.json();
       forceAll = !!body.forceAll;
+      console.log("Manual trigger received with forceAll:", forceAll);
     }
     
     // Get all crypto prices first
