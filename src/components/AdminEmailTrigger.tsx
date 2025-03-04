@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
 import { useToast } from "@/components/ui/use-toast";
+import { incrementEmailsSent } from "@/utils/realtimeTracking";
 
 const AdminEmailTrigger = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +41,9 @@ const AdminEmailTrigger = () => {
       const data = await response.json();
       
       if (response.ok) {
+        // Increment our emails sent counter for user-facing stats
+        incrementEmailsSent();
+        
         setResult({
           success: true,
           message: data.message || "Emails sent successfully!",
