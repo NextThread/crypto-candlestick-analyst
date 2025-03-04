@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 const TOTAL_CHARTS_ANALYZED_KEY = "total_charts_analyzed";
 const TOTAL_REGISTERED_USERS_KEY = "total_registered_users";
+const TOTAL_EMAILS_SENT_KEY = "total_emails_sent";
 
 // Function to get or initialize count from localStorage
 const getOrInitCount = (key: string, initialValue: number): number => {
@@ -21,7 +22,14 @@ const getOrInitCount = (key: string, initialValue: number): number => {
 
 // Function to increment count
 export const incrementCount = (key: string): number => {
-  const currentCount = getOrInitCount(key, key === TOTAL_CHARTS_ANALYZED_KEY ? 153427 : 2796);
+  const currentCount = getOrInitCount(
+    key, 
+    key === TOTAL_CHARTS_ANALYZED_KEY 
+      ? 153427 
+      : key === TOTAL_REGISTERED_USERS_KEY 
+        ? 2796 
+        : 128954
+  );
   const newCount = currentCount + 1;
   localStorage.setItem(key, newCount.toString());
   
@@ -60,10 +68,18 @@ export const incrementRegisteredUsers = (): number => {
   return incrementCount(TOTAL_REGISTERED_USERS_KEY);
 };
 
+export const incrementEmailsSent = (): number => {
+  return incrementCount(TOTAL_EMAILS_SENT_KEY);
+};
+
 export const useChartAnalyzedCount = (): number => {
   return useRealtimeCount(TOTAL_CHARTS_ANALYZED_KEY, 153427);
 };
 
 export const useRegisteredUsersCount = (): number => {
   return useRealtimeCount(TOTAL_REGISTERED_USERS_KEY, 2796);
+};
+
+export const useEmailsSentCount = (): number => {
+  return useRealtimeCount(TOTAL_EMAILS_SENT_KEY, 128954);
 };
