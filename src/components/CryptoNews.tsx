@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, ArrowUpRight, AlertCircle, Shield } from "lucide-react";
+import { Calendar, ArrowUpRight, AlertCircle, Shield, ChevronDown, ChevronUp } from "lucide-react";
 import axios from "axios";
 import { useState } from "react";
 
@@ -17,6 +17,8 @@ interface NewsItem {
 
 const CryptoNews = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [expanded, setExpanded] = useState<boolean>(false);
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   
   const categories = [
     { id: "all", label: "All News" },
@@ -49,6 +51,16 @@ const CryptoNews = () => {
   const filteredNews = news?.filter((item: NewsItem) => 
     selectedCategory === "all" || item.categories?.includes(selectedCategory)
   );
+
+  // Display only the first 3 items when not expanded
+  const displayedNews = expanded ? filteredNews : filteredNews?.slice(0, 3);
+
+  const toggleNewsItem = (id: string) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   if (isLoading) {
     return (
@@ -99,16 +111,22 @@ const CryptoNews = () => {
         </div>
 
         <div className="grid gap-6 max-w-5xl mx-auto">
-          {filteredNews?.map((item: NewsItem) => (
+          {displayedNews?.map((item: NewsItem) => (
             <a
               key={item.id}
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => {
+                if (e.target instanceof HTMLButtonElement) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+              }}
               className="group p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-200/10 hover:border-primary/50 transition-all duration-300"
             >
               <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2">
+                <div className="space-y-2 w-full">
                   <div className="flex items-center gap-2 mb-2">
                     {item.impact === "high" && (
                       <span className="flex items-center gap-1 text-xs bg-red-500/20 text-red-500 px-2 py-1 rounded-full">
@@ -126,12 +144,30 @@ const CryptoNews = () => {
                   <h3 className="text-xl font-semibold group-hover:text-primary transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-gray-400 line-clamp-2">{item.body}</p>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Calendar size={16} />
-                    <span>
-                      {new Date(item.published_on * 1000).toLocaleDateString()}
-                    </span>
+                  <p className={`text-gray-400 ${expandedItems[item.id] ? '' : 'line-clamp-2'}`}>
+                    {item.body}
+                  </p>
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <Calendar size={16} />
+                      <span>
+                        {new Date(item.published_on * 1000).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleNewsItem(item.id);
+                      }}
+                      className="text-gray-400 hover:text-primary transition-colors focus:outline-none"
+                    >
+                      {expandedItems[item.id] ? (
+                        <ChevronUp className="w-5 h-5" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5" />
+                      )}
+                    </button>
                   </div>
                 </div>
                 <ArrowUpRight className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
@@ -139,6 +175,18 @@ const CryptoNews = () => {
             </a>
           ))}
         </div>
+        
+        {filteredNews && filteredNews.length > 3 && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="flex items-center gap-2 px-6 py-2 bg-white/5 hover:bg-white/10 text-primary rounded-full transition-colors"
+            >
+              <span>{expanded ? "Show Less" : "Show More"}</span>
+              {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

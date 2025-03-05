@@ -58,12 +58,6 @@ const Navbar = () => {
                   <Link to="/blog" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white">
                     Blog
                   </Link>
-                  <Link to="/privacy-policy" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white">
-                    Privacy Policy
-                  </Link>
-                  <Link to="/terms-of-service" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white">
-                    Terms of Service
-                  </Link>
                 </div>
               </div>
             </div>
@@ -110,12 +104,6 @@ const Navbar = () => {
                 <div className="w-full bg-gray-800/50 rounded-md">
                   <Link to="/blog" onClick={closeMenu} className="block py-2 text-sm text-gray-300 hover:text-white w-full text-center">
                     Blog
-                  </Link>
-                  <Link to="/privacy-policy" onClick={closeMenu} className="block py-2 text-sm text-gray-300 hover:text-white w-full text-center">
-                    Privacy Policy
-                  </Link>
-                  <Link to="/terms-of-service" onClick={closeMenu} className="block py-2 text-sm text-gray-300 hover:text-white w-full text-center">
-                    Terms of Service
                   </Link>
                 </div>
               )}

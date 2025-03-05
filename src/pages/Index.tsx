@@ -21,6 +21,7 @@ import RealtimeStats from "@/components/RealtimeStats";
 import DiscountBadge from "@/components/DiscountBadge";
 import SubscriberBadge from "@/components/DiscountBadge";
 import { incrementRegisteredUsers } from "@/utils/realtimeTracking";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
@@ -364,8 +365,18 @@ const Index = () => {
       <Subscribe />
 
       <footer className="py-8 border-t border-gray-200/10">
-        <div className="container mx-auto px-4 text-center text-gray-400">
-          <p>&copy; 2025 CryptoAI. All rights reserved.</p>
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex items-center gap-6">
+              <Link to="/privacy-policy" className="text-sm text-gray-400 hover:text-white transition-colors">
+                Privacy Policy
+              </Link>
+              <Link to="/terms-of-service" className="text-sm text-gray-400 hover:text-white transition-colors">
+                Terms of Service
+              </Link>
+            </div>
+            <p className="text-sm text-gray-400">&copy; 2025 ChartlyAI. All rights reserved.</p>
+          </div>
         </div>
       </footer>
 
