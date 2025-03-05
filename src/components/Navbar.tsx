@@ -8,7 +8,6 @@ const Navbar = () => {
   const { isSignedIn } = useUser();
   const { signOut } = useClerk();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isResourcesOpen, setIsResourcesOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -20,12 +19,10 @@ const Navbar = () => {
       element.scrollIntoView({ behavior: 'smooth' });
     }
     setIsMenuOpen(false);
-    setIsResourcesOpen(false);
   };
 
   const closeMenu = () => {
     setIsMenuOpen(false);
-    setIsResourcesOpen(false);
   };
 
   return (
@@ -44,23 +41,10 @@ const Navbar = () => {
             <button onClick={() => scrollToSection('testimonials')} className="text-gray-300 hover:text-white transition-colors hover:scale-105">Testimonials</button>
             <button onClick={() => scrollToSection('contact')} className="text-gray-300 hover:text-white transition-colors hover:scale-105">Contact</button>
             
-            {/* Resources Dropdown */}
-            <div className="relative group">
-              <button 
-                className="flex items-center gap-1 text-gray-300 hover:text-white transition-colors hover:scale-105"
-                onClick={() => setIsResourcesOpen(!isResourcesOpen)}
-              >
-                Resources
-                <ChevronDown className="h-4 w-4" />
-              </button>
-              <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-gray-900 ring-1 ring-black ring-opacity-5 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300">
-                <div className="py-1">
-                  <Link to="/blog" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white">
-                    Blog
-                  </Link>
-                </div>
-              </div>
-            </div>
+            {/* Blog Link (Replaced Resources Dropdown) */}
+            <Link to="/blog" className="text-gray-300 hover:text-white transition-colors hover:scale-105">
+              Blog
+            </Link>
             
             {isSignedIn && (
               <button
@@ -91,22 +75,10 @@ const Navbar = () => {
               <button onClick={() => scrollToSection('testimonials')} className="text-gray-300 hover:text-white transition-colors w-full text-center py-2">Testimonials</button>
               <button onClick={() => scrollToSection('contact')} className="text-gray-300 hover:text-white transition-colors w-full text-center py-2">Contact</button>
               
-              {/* Resources Dropdown Mobile */}
-              <button 
-                onClick={() => setIsResourcesOpen(!isResourcesOpen)}
-                className="flex items-center justify-center gap-1 text-gray-300 hover:text-white transition-colors w-full text-center py-2"
-              >
-                Resources
-                <ChevronDown className={`h-4 w-4 transition-transform ${isResourcesOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              {isResourcesOpen && (
-                <div className="w-full bg-gray-800/50 rounded-md">
-                  <Link to="/blog" onClick={closeMenu} className="block py-2 text-sm text-gray-300 hover:text-white w-full text-center">
-                    Blog
-                  </Link>
-                </div>
-              )}
+              {/* Blog Link (Mobile) */}
+              <Link to="/blog" onClick={closeMenu} className="text-gray-300 hover:text-white transition-colors w-full text-center py-2">
+                Blog
+              </Link>
               
               {isSignedIn && (
                 <button
