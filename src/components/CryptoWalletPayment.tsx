@@ -167,7 +167,9 @@ const CryptoWalletPayment = ({
   const saveSubscription = (subscriptionDetails: any) => {
     if (window.localStorage && window.localStorage.getItem) {
       const userId = localStorage.getItem('userId') || 'anonymous';
+      
       localStorage.setItem(`subscription_${userId}`, JSON.stringify(subscriptionDetails));
+      
       localStorage.setItem(`analysisLimit_${userId}`, subscriptionDetails.analysisLimit.toString());
       
       localStorage.setItem(`analysisCount_${userId}`, "0");
